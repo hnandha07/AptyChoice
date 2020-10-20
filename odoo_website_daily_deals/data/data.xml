@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<data noupdate="1">
+    
+        <record id="menu_deals_offers" model="website.menu">
+            <field name="name">Deals &amp; Offers</field>
+            <field name="url">/deals</field>
+            <field name="parent_id" ref="website.main_menu"/>
+            <field name="sequence" type="int">45</field>
+            <field name="website_id" ref="website.default_website"/>
+        </record>
+        
+        
+		<record id="list_deals" model="product.pricelist">
+            <field name="name">Deals Offer Pricelist</field>
+            <field name="website_id" ref="website.default_website" />
+            <field name="selectable" eval="True" />
+            <field name="sequence">10</field>
+        </record>
+        
+         <record id="item_deals" model="product.pricelist.item">
+            <field name="pricelist_id" ref="list_deals"/>
+            <field name="compute_price">formula</field>
+            <field name="base">list_price</field>
+            <field name="price_discount">0</field>
+        </record>
+      
+    </data>
+</odoo>

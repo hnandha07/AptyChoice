@@ -1,0 +1,9 @@
+Version 13.0.0.0
+----------------
+ -> 
+
+Version: 13.0.0.1 | Date : 13/07/2020
+
+-->  Change create method of product pricelist item.
+-->  Add company_id field in product notebook.
+

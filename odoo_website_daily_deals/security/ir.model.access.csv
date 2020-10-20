@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_odoo_website_deals_offers_public,odoo_website_deals_offers_access,odoo_website_daily_deals.model_website_deals_offers,,1,1,1,1
+access_deals_product_product_public,odoo_product_template_access,product.model_product_product,base.group_public,1,0,0,0
