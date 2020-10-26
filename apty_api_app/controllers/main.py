@@ -1,11 +1,125 @@
 # -*- coding: utf-8 -*-
 import json
-from odoo import http
+from odoo import http, _
 from odoo.http import request
 from odoo.addons.website.controllers.main import Website
+from odoo.addons.website_form.controllers.main import WebsiteForm
+from odoo.addons.auth_signup.controllers.main import AuthSignupHome
+
+
+class WebsiteForm(WebsiteForm):
+    @http.route('/app/contactus', type='json', auth='public', website=True)
+    def app_contact_us(self, **kwargs):
+        try:
+            data = request.jsonrequest
+            if len(data):
+                data.update(email_to=request.env.company.email)
+                request.params = data
+                res = super(WebsiteForm, self).website_form(model_name='mail.mail', kwargs=data)
+                return {
+                    'response': res.status,
+                    'status': res.status_code
+                }
+        except Exception as e:
+            return {
+                'status': '4003',
+                'message': e
+            }
+
+
+class AuthSignupHome(AuthSignupHome):
+
+    def _get_app_login(self, login=False, password=False):
+        if login and password:
+            uid = request.session.authenticate(request.env.cr.dbname, login, password)
+            if not uid:
+                raise Exception(_('Authentication Failed.'))
+            uid = request.env['res.users'].sudo().browse(uid)
+            return {
+                'uid': uid.id,
+                'login': login,
+                'name': uid.name,
+            }
+        return False
+
+    @http.route('/app/login', type='json', auth='public', website=True)
+    def login_app_user(self, **kwargs):
+        try:
+            json_data = request.jsonrequest
+            if not len(json_data) or not json_data.get('login', False) or not json_data.get('password', False):
+                raise Exception(_("Not enough values"))
+            return self._get_app_login(login=json_data.get('login', False), password=json_data.get('password'))
+        except Exception as e:
+            return {
+                'message': e,
+                'status_code': '4002'
+            }
+
+    @http.route('/app/signup', type='json', auth='public', website=True)
+    def signup_app_user(self, **kwargs):
+        login = ''
+        try:
+            json_data = request.jsonrequest
+            if len(json_data.get('mobile', "")):
+                login = json_data.get('mobile')
+            if not login and len(json_data.get('email', '')):
+                login = json_data.get('email')
+
+            qcontext = self.get_auth_signup_config()
+            if not login:
+                raise ValueError("Not enough values for signup")
+
+            if 'error' not in qcontext.keys() and qcontext.get('signup_enabled', False) and login:
+                qcontext.update(json_data)
+                qcontext.update({
+                    'login': login
+                })
+                self.do_signup(qcontext)
+                user_data = self._get_app_login(login=login, password=json_data.get('password'))
+                uid = request.env['res.users'].sudo().browse(user_data.get('uid'))
+                uid.partner_id.write({
+                    'email': json_data.get('email', ''),
+                    'mobile': json_data.get('mobile', '')
+                })
+                request.env.cr.commit()
+                return user_data
+        except Exception as e:
+            return {
+                'message': "{0}".format(e),
+                'status_code': "4003"
+            }
 
 
 class Shop(Website):
+
+    @http.route('/app/deals', type='json', auth='public', website=True)
+    def get_app_deals(self):
+        try:
+            website_deals = request.env['website'].get_deals_offers()
+            if not len(website_deals):
+                raise ValueError(_("No deals available"))
+            response = []
+            for deal in website_deals:
+                response.append({
+                    'title': deal.deals_title,
+                    'description': deal.description,
+                    'deals_message_after_expiry': deal.deals_message_after_expiry,
+                    'deals_message_before_expiry': deal.deals_message_before_expiry,
+                    'offer_products': [
+                        {
+                            'id': offer.id,
+                            'name': offer.product_tmpl_id.name,
+                            'price': offer.fixed_price,
+                            'price_str': offer.price,
+                        } for offer in deal.offers_products
+                    ],
+                })
+            return response
+        except Exception as e:
+            return {
+                'message': e,
+                'code': '4003',
+            }
 
     @http.route('/app/home', type='http', auth='public', website=True)
     def get_home_page(self, **kwargs):
@@ -15,24 +129,6 @@ class Shop(Website):
         """
         if kwargs.get('from_app', False):
             return request.render('apty_api_app.home_page_content_app', {'from_app': True})
-
-    @http.route('/app/login', type='json', auth='public', website=True)
-    def app_login(self):
-        """
-        Authenticate user for login
-        :return: dict, response including uid, and status code
-        """
-        login_response = {}
-        json_data = request.jsonrequest
-        try:
-            if not len(json_data):
-                raise ValueError("No enough values.")
-        except ValueError as ve:
-            login_response = {
-                "msg": ve,
-                "code": 303
-            }
-        return login_response
 
     @http.route('/app/shop/products', type='json', auth='public', website=True)
     def get_shop_products(self):
@@ -45,6 +141,6 @@ class Shop(Website):
             domain += [('categ_id', 'in', json_data.get('categ_ids'))]
         if json_data.get('sort_by', False) and json_data.get('', False) and json_data.get('', False):
             order = '{0} {1}'.format(json_data.get('', False), json_data.get('', False))
-            return product_obj.search_read(domain=domain,
+        return product_obj.search_read(domain=domain,
                                        fields=['id', 'display_name', 'image_512', 'lst_price', 'website_style_ids'],
                                        offset=offset, limit=10, order=order)
