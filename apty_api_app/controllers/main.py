@@ -1,10 +1,38 @@
 # -*- coding: utf-8 -*-
-import json
 from odoo import http, _
 from odoo.http import request
 from odoo.addons.website.controllers.main import Website
 from odoo.addons.website_form.controllers.main import WebsiteForm
 from odoo.addons.auth_signup.controllers.main import AuthSignupHome
+from odoo.addons.website_sale.controllers.main import WebsiteSale
+
+
+class WebsiteSale(WebsiteSale):
+
+    @http.route('/app/cart', type='json', auth='none', cors="*", website=True)
+    def app_cart_update(self):
+        try:
+            json_data = request.jsonrequest
+            if len(json_data):
+                if not json_data.get('user_id', False):
+                    raise Exception("User Id missing in request data")
+                user = request.env['res.users'].sudo().browse(int(json_data.get('user_id')))
+                if not user.id:
+                    return {
+                        'status': 2000,
+                        'message': 'User ID not found in the request {}'.format(json_data)
+                    }
+                return True
+            else:
+                return {
+                    'status': 2001,
+                    'message': 'Not enough values in request {}'.format(json_data)
+                }
+        except Exception as e:
+            return {
+                'status': 2000,
+                'message': e
+            }
 
 
 class WebsiteForm(WebsiteForm):
@@ -138,9 +166,19 @@ class Shop(Website):
         order = 'create_date'
         domain = [('active', '=', True)]
         if json_data.get('filter_by_category', False):
-            domain += [('categ_id', 'in', json_data.get('categ_ids'))]
-        if json_data.get('sort_by', False) and json_data.get('', False) and json_data.get('', False):
-            order = '{0} {1}'.format(json_data.get('', False), json_data.get('', False))
-        return product_obj.search_read(domain=domain,
-                                       fields=['id', 'display_name', 'image_512', 'lst_price', 'website_style_ids'],
-                                       offset=offset, limit=10, order=order)
+            domain += [('categ_id', 'in', json_data.get('categ_ids',[]))]
+        if json_data.get('custom_search', False) and json_data.get('custom_search_keyword', False):
+            domain += [('name', 'ilike', json_data.get('custom_search_keyword'))]
+        if json_data.get('sort_by', False) :
+            order = '{0}'.format(json_data.get('sort_by', False))
+        product_obj = product_obj.search_read(domain=domain,
+                                                fields=['id', 'display_name', 'lst_price'],
+                                                offset=offset, limit=10, order=order)
+        for product in product_obj:
+            product.update({
+                'image_url': '/web/image/product.product/{0}/image_128'.format(product['id'])
+            })
+        return {
+            'products': product_obj,
+            'categories': request.env['product.category'].sudo().search_read(fields=['name', 'id'])
+        }
