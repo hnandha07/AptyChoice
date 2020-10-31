@@ -12,7 +12,7 @@
     'website': "http://www.yourcompany.com",
     'category': 'Extra',
     'version': '0.1',
-    'depends': ['website'],
+    'depends': ['website_sale'],
     'data': [
         'views/home_page_view.xml',
     ],

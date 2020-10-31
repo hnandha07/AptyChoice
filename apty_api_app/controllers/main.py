@@ -9,8 +9,53 @@ from odoo.addons.website_sale.controllers.main import WebsiteSale
 
 class WebsiteSale(WebsiteSale):
 
-    @http.route('/app/cart', type='json', auth='none', cors="*", website=True)
-    def app_cart_update(self):
+    @http.route('/app/order/history', type='json', auth='none', cors="*", website=True)
+    def app_order_history(self):
+        try:
+            json_data = request.jsonrequest
+            if not len(json_data) or not json_data.get('user_id'):
+                return {
+                    'status': 2001,
+                    'message': "Not enough values"
+                }
+            offset = json_data.get('scroll_count', 0) * 10
+            user_id = request.env.user.browse(json_data.get('user_id'))
+            if not user_id.id:
+                return {
+                    'status': 2002,
+                    'message': "User id not found"
+                }
+            domain = [('partner_id','=', user_id.partner_id.id)]
+            orders = request.env['sale.order'].sudo().search_read(domain=domain,
+                                                fields=['id', 'display_name', 'date_order', 'amount_total'],
+                                                offset=offset, limit=10)
+            return orders
+        except Exception as e:
+            return {
+                'status': 2000,
+                'message': e
+            }
+
+    @http.route('/app/order/cancel', type='json', auth='none', cors="*", website=True)
+    def app_order_cancel(self):
+        try:
+            json_data = request.jsonrequest
+            if not len(json_data) or not json_data.get('order_id'):
+                return {
+                    'status': 2001,
+                    'message': "Not enough values"
+                }
+            order = request.env['sale.order'].browse(json_data.get('order_id')).sudo()
+            status = order.action_cancel()
+            return status
+        except Exception as e:
+            return {
+                'status': 2000,
+                'message': e
+            }
+
+    @http.route('/app/order', type='json', auth='none', cors="*", website=True)
+    def app_add_order(self):
         try:
             json_data = request.jsonrequest
             if len(json_data):
@@ -22,7 +67,23 @@ class WebsiteSale(WebsiteSale):
                         'status': 2000,
                         'message': 'User ID not found in the request {}'.format(json_data)
                     }
-                return True
+                if not len(json_data.get('order_line_details')):
+                    return {
+                        'status': 2000,
+                        'message': 'Order line details not found in the request {}'.format(json_data)
+                    }
+                order = request.website.with_user(user=user).sale_get_order(force_create=1)
+                order_lines = []
+                for old in json_data.get('order_line_details'):
+                    order_lines.append((0,0,{
+                        'product_id': old.get('product_id'),
+                        'product_uom_qty': old.get('qty'),
+                    }))
+                if order.id:
+                    order.sudo().write({
+                        'order_line': order_lines
+                    })
+                return {'order_id': order.id}
             else:
                 return {
                     'status': 2001,
