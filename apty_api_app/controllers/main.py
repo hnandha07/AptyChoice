@@ -199,6 +199,7 @@ class Shop(Website):
                             'id': offer.id,
                             'name': offer.product_tmpl_id.name,
                             'price': offer.fixed_price,
+                            'image':'/web/image/product.template/{0}/image_128'.format(offer.product_tmpl_id.id),
                             'price_str': offer.price,
                         } for offer in deal.offers_products
                     ],
