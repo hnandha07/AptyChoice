@@ -2,6 +2,7 @@
 from odoo import http, _
 from odoo.http import request
 from odoo.addons.website.controllers.main import Website
+from odoo.exceptions import _logger
 from odoo.addons.website_form.controllers.main import WebsiteForm
 from odoo.addons.auth_signup.controllers.main import AuthSignupHome
 from odoo.addons.website_sale.controllers.main import WebsiteSale
@@ -149,6 +150,7 @@ class AuthSignupHome(AuthSignupHome):
         login = ''
         try:
             json_data = request.jsonrequest
+            _logger.error("Sign up process started with following datat: {0}".format(json_data))
             if len(json_data.get('mobile', "")):
                 login = json_data.get('mobile')
             if not login and len(json_data.get('email', '')):
@@ -173,6 +175,7 @@ class AuthSignupHome(AuthSignupHome):
                 request.env.cr.commit()
                 return user_data
         except Exception as e:
+            _logger.error("Error occured while sign up: {0}".format(e))
             return {
                 'message': "{0}".format(e),
                 'status_code': "4003"
