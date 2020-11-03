@@ -128,6 +128,8 @@ class AuthSignupHome(AuthSignupHome):
             return {
                 'uid': uid.id,
                 'login': login,
+                'mobile': uid.partner_id.phone and uid.partner_id.phone or uid.partner_id.mobile,
+                'email': uid.partner_id.email,
                 'name': uid.name,
             }
         return False
