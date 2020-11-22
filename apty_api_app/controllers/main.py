@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import random, requests, json
 from odoo import http, _
+from datetime import datetime
 from odoo.http import request
 from odoo.addons.website.controllers.main import Website
 from odoo.exceptions import _logger
@@ -21,15 +23,16 @@ class WebsiteSale(WebsiteSale):
                 }
             offset = json_data.get('scroll_count', 0) * 10
             user_id = request.env.user.browse(json_data.get('user_id'))
-            if not user_id.id:
-                return {
+            if not user_id.id:                return {
                     'status': 2002,
                     'message': "User id not found"
                 }
-            domain = [('partner_id','=', user_id.partner_id.id)]
-            orders = request.env['sale.order'].sudo().search_read(domain=domain,
-                                                fields=['id', 'display_name', 'date_order', 'amount_total'],
-                                                offset=offset, limit=10)
+            domain = [('partner_id', '=', user_id.partner_id.id)]
+            order_obj = request.env['sale.order'].sudo()
+            # domain += [('state', 'in', [status[0] for status in order_obj._fields['state'].selection])]
+            orders = order_obj.search_read(domain=domain,
+                                                fields=['id', 'display_name', 'date_order', 'amount_total', 'state'],
+                                                offset=offset, limit=10, order='create_date desc')
             return orders
         except Exception as e:
             return {
@@ -134,6 +137,28 @@ class AuthSignupHome(AuthSignupHome):
             }
         return False
 
+    @http.route('/app/change/password', type='json', auth='public', website=True)
+    def change_user_password(self):
+        try:
+            json_data = request.jsonrequest
+            request_type  = json_data.get('rtype', False)
+            login = json_data.get('login', False)
+            # if not len(json_data) or not all[request_type, login]:
+            #     raise  UserWarning("Not enough values:{}".format(json_data))
+            user = request.env['res.users'].sudo().search([('login', '=', login)])
+            if not user.id:
+                raise UserWarning("User not found: {}".format(user))
+            if request_type == 'update' and request.get('password', False):
+                update_status = user.write({'password': request.get('password')})
+                return {
+                    'status': update_status
+                }
+        except Exception as e:
+            return {
+                'message': e,
+                'status_code': '4002'
+            }
+
     @http.route('/app/login', type='json', auth='public', website=True)
     def login_app_user(self, **kwargs):
         try:
@@ -145,6 +170,37 @@ class AuthSignupHome(AuthSignupHome):
             return {
                 'message': e,
                 'status_code': '4002'
+            }
+
+    @http.route('/app/mobile/verification', type='json', auth='public', website=True)
+    def mobile_verification(self, **kwargs):
+        try:
+            json_data = request.jsonrequest
+            if len(json_data):
+                sms_api_key = request.env['ir.config_parameter'].sudo().get_param('apty_api_app.sms_api_key', False)
+                if not sms_api_key or not len(sms_api_key):
+                    _logger.info("SMS API Key is not set, Please set for mobile number verification")
+                    raise UserWarning("Something went wrong")
+
+                url = "https://2factor.in/API/V1"
+                if json_data.get('autogen', False):
+                    if not json_data.get('mobile', False):
+                        raise UserWarning("Not enough values for verification")
+                    url = '{0}/{1}/SMS/+91{2}/AUTOGEN'.format(url, sms_api_key, json_data.get('mobile'))
+                    response = requests.request("GET", url, headers={}, data={})
+                elif json_data.get('verify', False):
+                    if not json_data.get('session_id', False) and not json_data.get('otp', False):
+                        raise UserWarning("Not enough values for verification")
+                    url = '{0}/{1}/SMS/VERIFY/{2}/{3}'.format(url, sms_api_key, json_data.get('session_id'),
+                                                              json_data.get('otp'))
+                    response = requests.request("GET", url, headers={}, data={})
+                return json.loads(response.text)
+            else:
+                return {"status_code": 2004, "message": "Not enough values"}
+        except Exception as e:
+            return {
+                'message': "{0}".format(e),
+                'status_code': "4003"
             }
 
     @http.route('/app/signup', type='json', auth='public', website=True)
@@ -209,7 +265,7 @@ class Shop(Website):
                         } for offer in deal.offers_products
                     ],
                 })
-            return response
+            return {'result': response}
         except Exception as e:
             return {
                 'message': e,

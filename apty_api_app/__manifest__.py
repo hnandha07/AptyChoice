@@ -11,9 +11,10 @@
     'author': "My Company",
     'website': "http://www.yourcompany.com",
     'category': 'Extra',
-    'version': '0.1',
-    'depends': ['website_sale'],
+    'version': '0.2',
+    'depends': ['base_setup','website_sale'],
     'data': [
         'views/home_page_view.xml',
+        'views/res_config_settings_view.xml',
     ],
 }
