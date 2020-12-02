@@ -10,17 +10,56 @@ from odoo.addons.auth_signup.controllers.main import AuthSignupHome
 from odoo.addons.website_sale.controllers.main import WebsiteSale
 
 
+def _get_json_values(fields_to_check=[]):
+    json_data = request.jsonrequest
+    if not len(json_data) or (len(fields_to_check) and not all([json_data.get(ftc, False) for ftc in fields_to_check])):
+        raise UserWarning("Not enough values {0}".format(json_data))
+    return json_data
+
+
 class WebsiteSale(WebsiteSale):
 
-    @http.route('/app/order/history', type='json', auth='none', cors="*", website=True)
+    @http.route('/app/zip/check', type='json', auth='none', cors="*")
+    def check_zip_code(self):
+        try:
+            json_data = _get_json_values(fields_to_check=['pincode'])
+            pincode = request.env['regional.postal.code'].sudo().search([('name','=',json_data.get('pincode'))])
+            return {
+                'status': len(pincode) and True or False
+            }
+        except Exception as e:
+            _logger.info("Exception occurred while checking zip code {0}".format(e))
+            return {
+                'status': 2000,
+                'message': e
+            }
+
+    @http.route('/app/user/address', type='json', auth='none', cors="*")
     def app_order_history(self):
         try:
-            json_data = request.jsonrequest
-            if not len(json_data) or not json_data.get('user_id'):
-                return {
-                    'status': 2001,
-                    'message': "Not enough values"
-                }
+            json_data = _get_json_values(fields_to_check=['partner_id','mode','type','address'])
+            partner = request.env['res.partner'].sudo()
+            values = json_data.get('address')
+            partner_id = partner.browse(int(json_data.get('partner_id')))
+            if not partner.id:
+                raise UserWarning("Partner not found")
+            if json_data.get('mode') == 'new':
+                partner_id = partner.sudo().create(values).id
+            elif json_data.get('mode') == 'edit':
+                partner_id.write(values)
+            if json_data.get('order_id', False):
+                order = request.env['sale.order'].sudo().browse(int(json_data.get('order_id')))
+                order.partner_shipping_id = partner_id.id
+        except Exception as e:
+            return {
+                'status': 2000,
+                'message': e
+            }
+
+    @http.route('/app/order/history', type='json', auth='none', cors="*")
+    def app_order_history(self):
+        try:
+            json_data = _get_json_values('user_id')
             offset = json_data.get('scroll_count', 0) * 10
             user_id = request.env.user.browse(json_data.get('user_id'))
             if not user_id.id:                return {
@@ -40,15 +79,10 @@ class WebsiteSale(WebsiteSale):
                 'message': e
             }
 
-    @http.route('/app/order/cancel', type='json', auth='none', cors="*", website=True)
+    @http.route('/app/order/cancel', type='json', auth='none', cors="*")
     def app_order_cancel(self):
         try:
-            json_data = request.jsonrequest
-            if not len(json_data) or not json_data.get('order_id'):
-                return {
-                    'status': 2001,
-                    'message': "Not enough values"
-                }
+            json_data = _get_json_values(fields_to_check=['order_id'])
             order = request.env['sale.order'].browse(json_data.get('order_id')).sudo()
             status = order.action_cancel()
             return status
@@ -58,7 +92,7 @@ class WebsiteSale(WebsiteSale):
                 'message': e
             }
 
-    @http.route('/app/order', type='json', auth='none', cors="*", website=True)
+    @http.route('/app/order', type='json', auth='none', cors="*")
     def app_add_order(self):
         try:
             json_data = request.jsonrequest
@@ -101,7 +135,7 @@ class WebsiteSale(WebsiteSale):
 
 
 class WebsiteForm(WebsiteForm):
-    @http.route('/app/contactus', type='json', auth='public', website=True)
+    @http.route('/app/contactus', type='json', auth='public')
     def app_contact_us(self, **kwargs):
         try:
             data = request.jsonrequest
@@ -137,7 +171,7 @@ class AuthSignupHome(AuthSignupHome):
             }
         return False
 
-    @http.route('/app/change/password', type='json', auth='public', website=True)
+    @http.route('/app/change/password', type='json', auth='public')
     def change_user_password(self):
         try:
             json_data = request.jsonrequest
@@ -159,7 +193,7 @@ class AuthSignupHome(AuthSignupHome):
                 'status_code': '4002'
             }
 
-    @http.route('/app/login', type='json', auth='public', website=True)
+    @http.route('/app/login', type='json', auth='public')
     def login_app_user(self, **kwargs):
         try:
             json_data = request.jsonrequest
@@ -172,10 +206,10 @@ class AuthSignupHome(AuthSignupHome):
                 'status_code': '4002'
             }
 
-    @http.route('/app/mobile/verification', type='json', auth='public', website=True)
+    @http.route('/app/mobile/verification', type='json', auth='public')
     def mobile_verification(self, **kwargs):
         try:
-            json_data = request.jsonrequest
+            json_data = _get_json_values()
             if len(json_data):
                 sms_api_key = request.env['ir.config_parameter'].sudo().get_param('apty_api_app.sms_api_key', False)
                 if not sms_api_key or not len(sms_api_key):
@@ -195,15 +229,13 @@ class AuthSignupHome(AuthSignupHome):
                                                               json_data.get('otp'))
                     response = requests.request("GET", url, headers={}, data={})
                 return json.loads(response.text)
-            else:
-                return {"status_code": 2004, "message": "Not enough values"}
         except Exception as e:
             return {
                 'message': "{0}".format(e),
                 'status_code': "4003"
             }
 
-    @http.route('/app/signup', type='json', auth='public', website=True)
+    @http.route('/app/signup', type='json', auth='public')
     def signup_app_user(self, **kwargs):
         login = ''
         try:
@@ -242,7 +274,7 @@ class AuthSignupHome(AuthSignupHome):
 
 class Shop(Website):
 
-    @http.route('/app/deals', type='json', auth='public', website=True)
+    @http.route('/app/deals', type='json', auth='public')
     def get_app_deals(self):
         try:
             website_deals = request.env['website'].get_deals_offers()
@@ -272,7 +304,7 @@ class Shop(Website):
                 'code': '4003',
             }
 
-    @http.route('/app/home', type='http', auth='public', website=True)
+    @http.route('/app/home', type='http', auth='public')
     def get_home_page(self, **kwargs):
         """
         Render home page for App.
@@ -281,7 +313,7 @@ class Shop(Website):
         if kwargs.get('from_app', False):
             return request.render('apty_api_app.home_page_content_app', {'from_app': True})
 
-    @http.route('/app/shop/products', type='json', auth='public', website=True)
+    @http.route('/app/shop/products', type='json', auth='public')
     def get_shop_products(self):
         json_data = request.jsonrequest
         offset = json_data.get('scroll_count', 0) * 10
