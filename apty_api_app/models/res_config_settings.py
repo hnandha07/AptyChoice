@@ -22,7 +22,7 @@ class ResConfigSettings(models.TransientModel):
         res = super(ResConfigSettings, self).get_values()
         res.update({
             'sms_api_key':conf_obj.get_param('apty_api_app.sms_api_key'),
-            'valid_regional_code_ids':[(6, 0 , eval(conf_obj.get_param('apty_api_app.valid_regional_code_ids')))]
+            'valid_regional_code_ids':[(6, 0 , eval(conf_obj.get_param('apty_api_app.valid_regional_code_ids','[]')))]
         })
         return res
 
