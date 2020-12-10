@@ -1,4 +1,19 @@
 <odoo>
+    <template id="portal_frontend_layout" inherit_id="portal.frontend_layout">
+        <xpath expr="//header" position="attributes">
+            <attribute name="t-attf-class">#{for_mobile}</attribute>
+        </xpath>
+        <xpath expr="//footer" position="attributes">
+            <attribute name="t-attf-class">#{for_mobile}</attribute>
+        </xpath>
+    </template>
+
+    <template id="mobile_aboutus" name="Mobile About Us">
+        <t t-call="website.aboutus">
+            <t t-set="for_mobile" t-value="'d-none'"/>
+        </t>
+    </template>
+
     <template id="new_homepage" inherit_id="website.homepage" customize_show="True">
         <data inherit_id="website.homepage">
             <xpath expr="//div[@id='wrap']" position="replace">

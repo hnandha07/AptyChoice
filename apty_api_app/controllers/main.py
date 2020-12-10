@@ -59,13 +59,23 @@ class WebsiteSale(WebsiteSale):
     @http.route('/app/order/history', type='json', auth='none', cors="*")
     def app_order_history(self):
         try:
-            json_data = _get_json_values('user_id')
+            json_data = _get_json_values(fields_to_check=['user_id'])
             offset = json_data.get('scroll_count', 0) * 10
             user_id = request.env.user.browse(json_data.get('user_id'))
-            if not user_id.id:                return {
+            if not user_id.id:
+                return {
                     'status': 2002,
                     'message': "User id not found"
                 }
+            if json_data.get('order_id', False):
+                order = request.env['sale.order'].browse(int(json_data.get('order_id')))
+                if not order.id:
+                    request
+                    {
+                        'status': 4004,
+                        'message': "Order not found"
+                    }
+                return order._get_order_details()
             domain = [('partner_id', '=', user_id.partner_id.id)]
             order_obj = request.env['sale.order'].sudo()
             # domain += [('state', 'in', [status[0] for status in order_obj._fields['state'].selection])]
@@ -209,7 +219,7 @@ class AuthSignupHome(AuthSignupHome):
     @http.route('/app/mobile/verification', type='json', auth='public')
     def mobile_verification(self, **kwargs):
         try:
-            json_data = _get_json_values()
+            json_data = _get_json_values(fields_to_check=['mobile','request_type'])
             if len(json_data):
                 sms_api_key = request.env['ir.config_parameter'].sudo().get_param('apty_api_app.sms_api_key', False)
                 if not sms_api_key or not len(sms_api_key):
@@ -220,14 +230,23 @@ class AuthSignupHome(AuthSignupHome):
                 if json_data.get('autogen', False):
                     if not json_data.get('mobile', False):
                         raise UserWarning("Not enough values for verification")
+
+                    users = request.env['res.users'].sudo().search([('login', '=', json_data.get('mobile'))])
+
+                    if json_data.get('request_type','') == 'signup' and len(users.ids):
+                        raise UserWarning("User already exists with this mobile number")
+
+                    if json_data.get('request_type','') == 'password' and not len(users.ids):
+                        raise UserWarning("User does not found with this mobile number")
+
                     url = '{0}/{1}/SMS/+91{2}/AUTOGEN'.format(url, sms_api_key, json_data.get('mobile'))
-                    response = requests.request("GET", url, headers={}, data={})
+
                 elif json_data.get('verify', False):
                     if not json_data.get('session_id', False) and not json_data.get('otp', False):
                         raise UserWarning("Not enough values for verification")
                     url = '{0}/{1}/SMS/VERIFY/{2}/{3}'.format(url, sms_api_key, json_data.get('session_id'),
                                                               json_data.get('otp'))
-                    response = requests.request("GET", url, headers={}, data={})
+                response = requests.request("GET", url, headers={}, data={})
                 return json.loads(response.text)
         except Exception as e:
             return {
@@ -278,8 +297,6 @@ class Shop(Website):
     def get_app_deals(self):
         try:
             website_deals = request.env['website'].get_deals_offers()
-            if not len(website_deals):
-                raise ValueError(_("No deals available"))
             response = []
             for deal in website_deals:
                 response.append({
@@ -297,12 +314,21 @@ class Shop(Website):
                         } for offer in deal.offers_products
                     ],
                 })
-            return {'result': response}
+            return response
         except Exception as e:
             return {
                 'message': e,
                 'code': '4003',
             }
+
+    @http.route('/app/aboutus', type='http', auth='public', website=True)
+    def get_about_us(self, **kwargs):
+        """
+        Render Home Page for App
+        :param kwargs:
+        :return:
+        """
+        return request.render('apty_api_app.mobile_aboutus',{})
 
     @http.route('/app/home', type='http', auth='public')
     def get_home_page(self, **kwargs):

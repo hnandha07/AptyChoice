@@ -30,3 +30,16 @@ class ResConfigSettings(models.TransientModel):
         self.env['ir.config_parameter'].sudo().set_param('apty_api_app.sms_api_key', self.sms_api_key)
         self.env['ir.config_parameter'].sudo().set_param('apty_api_app.valid_regional_code_ids', self.valid_regional_code_ids.ids)
         super(ResConfigSettings, self).set_values()
+
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    @api.model
+    def _get_order_details(self):
+        order_lines = [{'product_id': ol.product_id, 'product_name': ol.product_id.name, 'qty': ol.product_uom_qty,
+                        'price': ol.price, 'sub_total': ol.sub_total} for ol in self.order_lines]
+        return {
+            'state': self.state,
+            'total': self.amount_total,
+            'order_lines': order_lines
+        }
