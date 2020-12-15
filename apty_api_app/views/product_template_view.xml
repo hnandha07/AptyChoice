@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+       <record id="product_template_form_view_inherit" model="ir.ui.view">
+           <field name="name">product.template.form.view.inherit</field>
+           <field name="model">product.template</field>
+           <field name="inherit_id" ref="product.product_template_form_view"/>
+           <field name="arch" type="xml">
+               <xpath expr="//field[@name='standard_price']" position="after">
+                   <field name="is_available" widget="boolean_toggle"/>
+                   <field name="is_available_full_day" widget="boolean_toggle"/>
+                   <field name="availability_time" attrs="{
+                    'invisible': [('is_available_full_day','=', False)]
+                   }"/>
+               </xpath>
+           </field>
+       </record>
+
+        <record id="base_view_company_form_inherit" model="ir.ui.view">
+            <field name="name">base.view.company.form.inherit</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='favicon']" position="after">
+                    <field name="shop_time_open"/>
+                    <field name="shop_time_close"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

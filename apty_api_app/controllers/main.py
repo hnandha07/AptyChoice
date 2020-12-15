@@ -68,7 +68,7 @@ class WebsiteSale(WebsiteSale):
                     'message': "User id not found"
                 }
             if json_data.get('order_id', False):
-                order = request.env['sale.order'].browse(int(json_data.get('order_id')))
+                order = request.env['sale.order'].sudo().browse(int(json_data.get('order_id')))
                 if not order.id:
                     request
                     {
@@ -102,7 +102,7 @@ class WebsiteSale(WebsiteSale):
                 'message': e
             }
 
-    @http.route('/app/order', type='json', auth='none', cors="*")
+    @http.route('/app/order', type='json', auth='none', cors="*", website=True)
     def app_add_order(self):
         try:
             json_data = request.jsonrequest
@@ -184,15 +184,17 @@ class AuthSignupHome(AuthSignupHome):
     @http.route('/app/change/password', type='json', auth='public')
     def change_user_password(self):
         try:
-            json_data = request.jsonrequest
+            json_data = _get_json_values(fields_to_check=['login', 'request_type','password'])
             request_type  = json_data.get('rtype', False)
             login = json_data.get('login', False)
-            # if not len(json_data) or not all[request_type, login]:
-            #     raise  UserWarning("Not enough values:{}".format(json_data))
             user = request.env['res.users'].sudo().search([('login', '=', login)])
             if not user.id:
                 raise UserWarning("User not found: {}".format(user))
-            if request_type == 'update' and request.get('password', False):
+            if request_type == 'match':
+                return {
+                    'status': user.password == json_data.get('password','')
+                }
+            if request_type == 'update':
                 update_status = user.write({'password': request.get('password')})
                 return {
                     'status': update_status
@@ -280,6 +282,10 @@ class AuthSignupHome(AuthSignupHome):
                 uid.partner_id.write({
                     'email': json_data.get('email', ''),
                     'mobile': json_data.get('mobile', '')
+                })
+                user_data.update({
+                    'email':uid.partner_id.email,
+                    'mobile':uid.partner_id.mobile,
                 })
                 request.env.cr.commit()
                 return user_data

@@ -36,8 +36,8 @@ class SaleOrder(models.Model):
 
     @api.model
     def _get_order_details(self):
-        order_lines = [{'product_id': ol.product_id, 'product_name': ol.product_id.name, 'qty': ol.product_uom_qty,
-                        'price': ol.price, 'sub_total': ol.sub_total} for ol in self.order_lines]
+        order_lines = [{'product_id': ol.product_id.id, 'product_name': ol.product_id.name, 'qty': ol.product_uom_qty,
+                        'price': ol.price_unit, 'sub_total': ol.price_subtotal} for ol in self.order_line]
         return {
             'state': self.state,
             'total': self.amount_total,
