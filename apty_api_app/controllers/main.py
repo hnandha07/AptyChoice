@@ -34,6 +34,31 @@ class WebsiteSale(WebsiteSale):
                 'message': e
             }
 
+    @http.route('/app/address/list', type='json', auth='none', cors="*")
+    def get_address_list(self):
+        try:
+            partner_address = {}
+            json_data = _get_json_values(fields_to_check=['user_id'])
+            partner = request.env['res.users'].sudo().search([('id','=', int(json_data.get('user_id')))])
+            if partner.id:
+                partner = partner.partner_id
+                partner_address.update({
+                    partner.id: partner._get_address_values()
+                })
+                for child in partner.child_ids:
+                    partner_address.update({
+                        child.id: child._get_address_values()
+                    })
+                return partner_address
+            else:
+                raise UserWarning("User not found")
+        except Exception as e:
+            _logger.info("Exception occurred while checking preparing address: {0}".format(e))
+            return {
+                'status': 2000,
+                'message': e
+            }
+
     @http.route('/app/user/address', type='json', auth='none', cors="*")
     def app_order_history(self):
         try:
@@ -256,6 +281,36 @@ class AuthSignupHome(AuthSignupHome):
                                                               json_data.get('otp'))
                 response = requests.request("GET", url, headers={}, data={})
                 return json.loads(response.text)
+        except Exception as e:
+            return {
+                'message': "{0}".format(e),
+                'status_code': "4003"
+            }
+
+    @http.route('/app/email/check', type='json', auth='public')
+    def app_email_check(self):
+        try:
+            json_data = _get_json_values(fields_to_check=['email'])
+            return {
+                'status': not len(request.env.user.partner_id.search([('email', '=', json_data.get('email'))]))
+            }
+        except Exception as e:
+            return {
+                'message': "{0}".format(e),
+                'status_code': "4003"
+            }
+
+    @http.route('/app/profile/edit', type='json', auth='public')
+    def app_edit_profile(self):
+        try:
+            json_data = _get_json_values(fields_to_check=['values'])
+            user = request.env.user.browse(int(json_data.get('user_id')))
+            if not user.id:
+                raise UserWarning("User not found")
+            res = user.partner_id.write(json_data.get('values'))
+            return {
+                'status': res
+            }
         except Exception as e:
             return {
                 'message': "{0}".format(e),
