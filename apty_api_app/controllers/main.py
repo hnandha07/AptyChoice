@@ -189,11 +189,11 @@ class AuthSignupHome(AuthSignupHome):
             login = json_data.get('login', False)
             user = request.env['res.users'].sudo().search([('login', '=', login)])
             if not user.id:
-                raise UserWarning("User not found: {}".format(user))
+                raise UserWarning("User not found: {}:".format(user))
             if request_type == 'match':
                 status = 1
                 try:
-                    user._check_credentials(password=json_data.get('password'))
+                    user.with_user(user.id)._check_credentials(password=json_data.get('password'))
                 except Exception as e:
                     _logger.info("Exception raise during password match {0}".format(e))
                     status = 0
