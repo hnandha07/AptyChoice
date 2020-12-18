@@ -185,14 +185,19 @@ class AuthSignupHome(AuthSignupHome):
     def change_user_password(self):
         try:
             json_data = _get_json_values(fields_to_check=['login', 'request_type','password'])
-            request_type  = json_data.get('rtype', False)
+            request_type  = json_data.get('request_type', False)
             login = json_data.get('login', False)
             user = request.env['res.users'].sudo().search([('login', '=', login)])
             if not user.id:
                 raise UserWarning("User not found: {}".format(user))
             if request_type == 'match':
+                status = 1
+                try:
+                    user._check_credentials(password=json_data.get('password'))
+                except Exception as e:
+                    status = 0
                 return {
-                    'status': user.password == json_data.get('password','')
+                    'status': status
                 }
             if request_type == 'update':
                 update_status = user.write({'password': request.get('password')})
