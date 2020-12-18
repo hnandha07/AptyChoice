@@ -195,6 +195,7 @@ class AuthSignupHome(AuthSignupHome):
                 try:
                     user._check_credentials(password=json_data.get('password'))
                 except Exception as e:
+                    _logger.info("Exception raise during password match {0}".format(e))
                     status = 0
                 return {
                     'status': status
