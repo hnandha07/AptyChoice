@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <template id="cash_on_delivery_form" name="Cash on Delivery Form">
+            <input type="hidden" name="data_set" t-att-data-action-url="tx_url" data-remove-me=""/>
+            <t t-if="return_url">
+                <input type="hidden" name='return_url' t-att-value='return_url'/>
+            </t>
+            <input type="hidden" name='cod_payment_reference' t-att-value='cod_payment_reference'/>
+            <input type="hidden" name='amount' t-att-value='amount'/>
+        </template>
+    </data>
+</odoo>

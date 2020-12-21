@@ -8,7 +8,7 @@
         Handle API Calls for Android devices for 
         synchronizing the process.
     """,
-    'author': "My Company",
+    'author': "AptyChoice",
     'website': "http://www.yourcompany.com",
     'category': 'Extra',
     'version': '0.2',
