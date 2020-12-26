@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import random, requests, json
+import requests, json
+from pprint import pprint, pformat
 from odoo import http, _
-from datetime import datetime
 from odoo.http import request
 from odoo.addons.website.controllers.main import Website
 from odoo.exceptions import _logger
@@ -37,18 +37,14 @@ class WebsiteSale(WebsiteSale):
     @http.route('/app/address/list', type='json', auth='none', cors="*")
     def get_address_list(self):
         try:
-            partner_address = {}
+            partner_address = []
             json_data = _get_json_values(fields_to_check=['user_id'])
             partner = request.env['res.users'].sudo().search([('id','=', int(json_data.get('user_id')))])
             if partner.id:
                 partner = partner.partner_id
-                partner_address.update({
-                    partner.id: partner._get_address_values()
-                })
+                partner_address.append(partner._get_address_values())
                 for child in partner.child_ids:
-                    partner_address.update({
-                        child.id: child._get_address_values()
-                    })
+                    partner_address.append(child._get_address_values())
                 return partner_address
             else:
                 raise UserWarning("User not found")
@@ -59,25 +55,55 @@ class WebsiteSale(WebsiteSale):
                 'message': e
             }
 
-    @http.route('/app/user/address', type='json', auth='none', cors="*")
-    def app_order_history(self):
+    @http.route('/app/user/address', type='json', auth='none', cors="*", website=True)
+    def app_user_address(self):
         try:
-            json_data = _get_json_values(fields_to_check=['partner_id','mode','type','address'])
+            json_data = {}
+            if request.jsonrequest.get('mode', False) and request.jsonrequest.get('mode','') == 'new':
+                json_data = _get_json_values(fields_to_check=['partner_id', 'mode', 'type', 'address'])
+            if request.jsonrequest.get('mode', False) and request.jsonrequest.get('mode', '') == 'edit':
+                json_data = _get_json_values(fields_to_check=['partner_id', 'mode', 'address'])
+            else:
+                json_data = _get_json_values(fields_to_check=['partner_id'])
             partner = request.env['res.partner'].sudo()
             values = json_data.get('address')
+            status = False
             partner_id = partner.browse(int(json_data.get('partner_id')))
-            if not partner.id:
+            if not partner_id.id:
                 raise UserWarning("Partner not found")
+            if json_data.get('mode') == 'delete':
+                status = partner_id.unlink()
             if json_data.get('mode') == 'new':
-                partner_id = partner.sudo().create(values).id
+                values.update({
+                    'company_id': False,
+                    'lang': request.lang.code,
+                    'country_id':request.env.ref('base.in').id,
+                    'state_id':request.env.ref('base.state_in_tn').id,
+                })
+                if json_data.get('type') == 'shipping':
+                    values.update({
+                        'parent_id': partner_id.commercial_partner_id.id,
+                        'type': 'delivery',
+                    })
+                ctx = request.env.context.copy()
+                ctx.update({
+                    'mail_create_nosubscribe':True,
+                    'force_company':partner_id.company_id.id,
+                })
+                partner_id = partner.with_context(ctx).create(values).id
+                status = bool(partner_id)
             elif json_data.get('mode') == 'edit':
-                partner_id.write(values)
+                status = partner_id.write(values)
             if json_data.get('order_id', False):
                 order = request.env['sale.order'].sudo().browse(int(json_data.get('order_id')))
                 order.partner_shipping_id = partner_id.id
-        except Exception as e:
             return {
-                'status': 2000,
+                'status': status
+            }
+        except Exception as e:
+            _logger.info("Exception occurred while user address action: {0} - {1}".format(e, pprint(json_data)))
+            return {
+                'status': False,
                 'message': e
             }
 
@@ -130,44 +156,49 @@ class WebsiteSale(WebsiteSale):
     @http.route('/app/order', type='json', auth='none', cors="*", website=True)
     def app_add_order(self):
         try:
-            json_data = request.jsonrequest
-            if len(json_data):
-                if not json_data.get('user_id', False):
-                    raise Exception("User Id missing in request data")
-                user = request.env['res.users'].sudo().browse(int(json_data.get('user_id')))
-                if not user.id:
-                    return {
-                        'status': 2000,
-                        'message': 'User ID not found in the request {}'.format(json_data)
-                    }
-                if not len(json_data.get('order_line_details')):
-                    return {
-                        'status': 2000,
-                        'message': 'Order line details not found in the request {}'.format(json_data)
-                    }
-                order = request.website.with_user(user=user).sale_get_order(force_create=1)
-                order_lines = []
-                for old in json_data.get('order_line_details'):
-                    order_lines.append((0,0,{
-                        'product_id': old.get('product_id'),
-                        'product_uom_qty': old.get('qty'),
-                    }))
-                if order.id:
-                    order.sudo().write({
-                        'order_line': order_lines
-                    })
-                return {'order_id': order.id}
-            else:
+            json_data = _get_json_values(fields_to_check=['user_id','mode'])
+            mode = json_data.get('mode')
+            user = request.env['res.users'].sudo().browse(int(json_data.get('user_id')))
+            if not user.id:
                 return {
-                    'status': 2001,
-                    'message': 'Not enough values in request {}'.format(json_data)
+                    'status': 2000,
+                    'message': 'User ID not found in the request {}'.format(json_data)
                 }
+            if mode == 'set_shipping_partner':
+                json_data = _get_json_values(fields_to_check=['order_id', 'partner_id'])
+                order = request.env['sale.order'].browse(int(json_data.get('order_id'))).sudo()
+                if not order.id:
+                    raise UserWarning("Order not found")
+                order.write({
+                    'partner_shipping_id': int(json_data.get('partner_id'))
+                })
+            order_lines = []
+            if mode == 'new':
+                order = request.website.with_user(user=user).sale_get_order(force_create=1)
+            elif mode == 'edit':
+                order = request.env['sale.order'].browse(int(json_data.get('order_id'))).sudo()
+                order.order_line.unlink()
+            if not order.id:
+                raise UserWarning("Order not found")
+            for old in json_data.get('order_line_details',[]):
+                order_lines.append((0, 0, {
+                    'product_id': old.get('product_id'),
+                    'product_uom_qty': old.get('qty'),
+                }))
+                ctx = request.env.context.copy()
+                ctx.update({
+                    'force_company': order.company_id.id,
+                    'allowed_company_ids':[order.company_id.id]
+                })
+                order.sudo().with_context(ctx).write({
+                    'order_line': order_lines
+                })
+            return {'order_id':order.id}
         except Exception as e:
             return {
                 'status': 2000,
                 'message': e
             }
-
 
 class WebsiteForm(WebsiteForm):
     @http.route('/app/contactus', type='json', auth='public')
@@ -200,6 +231,7 @@ class AuthSignupHome(AuthSignupHome):
             return {
                 'uid': uid.id,
                 'login': login,
+                'partner_id': uid.partner_id.id,
                 'mobile': uid.partner_id.phone and uid.partner_id.phone or uid.partner_id.mobile,
                 'email': uid.partner_id.email,
                 'name': uid.name,
@@ -226,9 +258,9 @@ class AuthSignupHome(AuthSignupHome):
                     'status': status
                 }
             if request_type == 'update':
-                update_status = user.write({'password': request.get('password')})
+                update_status = user.write({'password': json_data.get('password')})
                 return {
-                    'status': update_status
+                    'status': int(update_status)
                 }
         except Exception as e:
             return {

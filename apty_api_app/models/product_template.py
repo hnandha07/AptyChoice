@@ -22,7 +22,9 @@ class ResPartner(models.Model):
 
     def _get_address_values(self):
         if self.id:
-            details = {}
+            details = {
+                'partner_id': self.id
+            }
             for field in ['street', 'street2', 'state_id', 'city', 'zip', 'country_id']:
                 if field in ['state_id', 'country_id']:
                     details.update({field.split('_')[0]: self[field].name})
