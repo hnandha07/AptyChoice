@@ -185,14 +185,19 @@ class WebsiteSale(WebsiteSale):
                     'product_id': old.get('product_id'),
                     'product_uom_qty': old.get('qty'),
                 }))
-                ctx = request.env.context.copy()
-                ctx.update({
-                    'force_company': order.company_id.id,
-                    'allowed_company_ids':[order.company_id.id]
+            ctx = request.env.context.copy()
+            ctx.update({
+                'force_company': order.company_id.id,
+                'allowed_company_ids':[order.company_id.id]
+            })
+            values = {
+                'order_line': order_lines
+            }
+            if len(json_data.get('delivery_date','')):
+                values.update({
+                    'commitment_date': json_data.get('delivery_date')
                 })
-                order.sudo().with_context(ctx).write({
-                    'order_line': order_lines
-                })
+            order.sudo().with_context(ctx).write(values)
             return {'order_id':order.id}
         except Exception as e:
             return {
