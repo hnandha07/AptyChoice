@@ -86,9 +86,10 @@ class WebsiteSale(WebsiteSale):
                         'type': 'delivery',
                     })
                 ctx = request.env.context.copy()
+                company_id = partner_id.company_id.id and partner_id.company_id.id or request.website.company_id.id
                 ctx.update({
                     'mail_create_nosubscribe':True,
-                    'force_company':partner_id.company_id.id,
+                    'force_company':company_id,
                 })
                 partner_id = partner.with_context(ctx).create(values).id
                 status = bool(partner_id)
