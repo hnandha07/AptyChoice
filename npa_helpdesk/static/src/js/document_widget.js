@@ -93,7 +93,7 @@ var _t = core._t;
             this.contra_acct_list = [];
             this.margin_acct_list = [];
             var self = this;
-            if (this.model === "npa.customer_details" && this.name === "document_ids") {
+            if (this.model === "res.partner" && this.name === "document_ids") {
                 this.recordData.document_ids.data.forEach(function(value){
                     self.attach_list.push(value.data);
                     value.data['approval'] = true;
@@ -141,7 +141,7 @@ var _t = core._t;
             event.preventDefault();
             var attachmentName = event.currentTarget.outerText;
             var attachmentID = ''
-            if (this.model === "npa.customer_details" && this.name === "document_ids" && this.attach_list) {
+            if (this.model === "res.partner" && this.name === "document_ids" && this.attach_list) {
                 for (var i = 0 ; i < this.attach_list.length; i++) {
                     if (this.attach_list[i]['name'] == attachmentName){
                         attachmentID = this.attach_list[i]['id'];

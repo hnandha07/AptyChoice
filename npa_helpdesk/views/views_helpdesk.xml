@@ -388,28 +388,6 @@
                 </xpath>
             </field>
         </record> 
-        <!-- this is a mobile ashboard form for documents -->
-	   <record id="view_mobile_db_document_form" model="ir.ui.view">
-		   <field name="model">npa.document</field>
-		   <field name="priority" eval="0" />
-		   <field name="arch" type="xml">
-			   <form>
-					<group>
-						<group>
-							<field name="name" required="1"/>
-							<field name="file_name" invisible="True"/>
-							<field name="doc_class_id" required="True" options="{'no_open':True,'no_create':True}"/>
-							<field name="doc_type_id" invisible="True" options="{'no_open':True,'no_create':True}"/>
-							<field name="document" string="Upload Slide 1" filename="file_name"/>
-							<field name="file_name_related" string="Slide 1 image" readonly="1" required="1"/>
-							<field name="file_loc" string="Slide 1 Location" widget="doc_url" readonly="1"/>                            
-							<field name="notes"/>
-							<field name="state"/>
-							<field name="date_valid"/>
-						</group>
-					</group>
-			   </form>
-			</field> 
-		</record>   
+       
     </data>
 </odoo>

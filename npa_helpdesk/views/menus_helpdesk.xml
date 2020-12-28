@@ -33,10 +33,7 @@
 
         <!-- Document Menu -->
         <menuitem id="menu_npa_doc_tran" parent="menu_npa_document" sequence="14"
-            name="Documents" action="action_npa_doc_tran"/>
-
-        <menuitem id="menu_mobile_db_doc" parent="menu_npa_document" sequence="14"
-            name="Dashboard Documents" action="action_mobile_db_doc"/>
+            name="Documents" action="action_npa_doc_tran"/>        
 
         <!-- Helpdesk Menu -->
         <menuitem id="menu_npa_helpdesk_case" parent="menu_npa_helpdesk" sequence="51"
