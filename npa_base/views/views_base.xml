@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--  Start Common Code details views -->
+        <!-- Common code tree view -->
+        <record id="view_common_code_tree" model="ir.ui.view">
+            <field name="name">Common code</field>
+            <field name="model">npa.common_code</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <tree >
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="default_rec"/>
+                    <field name="parm1"/>
+                    <field name="parm2"/>                    
+                </tree>
+            </field>
+        </record>
+
+        <!--  Common code form view -->
+        <record id="view_setup_common_form" model="ir.ui.view">
+            <field name="name">setup common - default form view</field>
+            <field name="model">npa.common_code</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group colspan="4">
+                            <group>
+                                <field name="name" required ="True"/>
+                                <field name="code_type" readonly='1'/>
+                             </group>
+                            <group>
+                                <field name="code" required ="True"/>
+                                <field name="default_rec"/>
+                            </group>
+                        </group>
+                        <group colspan="4" string="Parameters">
+                            <group>
+                                <field name="parm1"/>
+                            </group>
+                            <group>
+                                <field name="parm2"/>
+                           </group>
+                        </group>
+                        <group>
+                              <table style='width:100%;'>
+                                <tr>
+                                  <th style='width:7%;'><label for="create_date" string='Created:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="create_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="create_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td style='width:20%;'><field name="create_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                  <th style='width:7%;'><label for="write_date" string='Last updated:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="write_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="write_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td><field name="write_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                </tr>
+                             </table>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Common code search view  -->
+        <record id="view_common_code_search" model="ir.ui.view">
+            <field name="name">Common code</field>
+            <field name="model">npa.common_code</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="code"/>
+                </search>
+            </field>
+        </record>
+        <!-- End Common code details views-->
+          
+
+        <!-- Start Config views -->
+        <!-- Config tree view -->
+        <record id="view_config_tree" model="ir.ui.view">
+            <field name="name">System configuratione</field>
+            <field name="model">npa.config</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="code_type"/>
+                    <field name="code"/>
+                    <field name="parm1"/>
+                    <field name="parm2"/>
+                    <field name="amt1"/>
+                    <field name="amt2"/>
+                    <field name="int1"/>
+                    <field name="int2"/>
+                    <field name="date1"/>
+                    <field name="date2"/>
+                    <field name="default_rec"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Config search view -->
+        <record id="view_config_search" model="ir.ui.view">
+            <field name="name">System configuratione</field>
+            <field name="model">npa.config</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="code"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Config form view -->
+        <record id="view_config_form" model="ir.ui.view">
+            <field name="name">System configuration</field>
+            <field name="model">npa.config</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group colspan="4" string="Configuration">
+                            <group>
+                                <field name="name" required="True"/>
+                            </group>
+                            <group>
+                                <field name="code_type" required="True"/>
+                                <field name="code" required="True"/>
+                            </group>
+                        </group>
+                        <group colspan="4" string="Parameter values (text)">
+                            <group>
+                                <label for="parm1" />
+                                <div>
+                                    <field name="parm1" class="oe_inline"/>
+                                    <field name="parm1_desc" readonly="True" class="oe_inline"/>
+                                </div>
+                                <label for="parm2" />
+                                <div>
+                                    <field name="parm2" class="oe_inline"/>
+                                    <field name="parm2_desc" readonly="True" class="oe_inline"/>
+                                </div>
+                                <label for="parm3" />
+                                <div>
+                                    <field name="parm3" class="oe_inline"/>
+                                    <field name="parm3_desc" readonly="True" class="oe_inline"/>
+                                </div>
+                            </group>
+                            <group>
+                                <label for="parm4" />
+                                <div>
+                                    <field name="parm4" class="oe_inline"/>
+                                    <field name="parm4_desc" readonly="True" class="oe_inline"/>
+                                </div>
+                                <label for="parm5" />
+                                <div>
+                                    <field name="parm5" class="oe_inline"/>
+                                    <field name="parm5_desc" readonly="True" class="oe_inline"/>
+                                </div>
+                                <label for="parm6" />
+                                <div>
+                                    <field name="parm6" class="oe_inline"/>
+                                    <field name="parm6_desc" readonly="True" class="oe_inline"/>
+                                </div>
+                            </group>
+                         </group>
+                        <group colspan="4" string="Parameter values (Amount)">
+                            <group>
+                                <label for="amt1" />
+                                <div>
+                                    <field name="amt1" class="oe_inline"/>
+                                    <field name="amt1_desc" readonly="True" class="oe_inline"/>
+                                </div>
+                            </group>
+                            <group>
+                                <label for="amt2" />
+                                <div>
+                                    <field name="amt2" class="oe_inline"/>
+                                    <field name="amt2_desc" readonly="True" class="oe_inline"/>
+                                </div>
+                            </group>
+                            <group>
+                                <label for="amt3" />
+                                <div>
+                                    <field name="amt3" class="oe_inline"/>
+                                    <field name="amt3_desc" readonly="True" class="oe_inline"/>
+                                </div>
+                            </group>
+                            <group>
+                                <label for="amt4" />
+                                <div>
+                                    <field name="amt4" class="oe_inline"/>
+                                    <field name="amt4_desc" readonly="True" class="oe_inline"/>
+                                </div>
+                            </group>
+                        </group>
+                        <group colspan="4" string="Parameter values (Number)">
+                            <group>
+                                <label for="int1" />
+                                <div>
+                                    <field name="int1" class="oe_inline"/>
+                                    <field name="int1_desc" readonly="True" class="oe_inline"/>
+                                </div>
+                            </group>
+                            <group>
+                                <label for="int2" />
+                                <div>
+                                    <field name="int2" class="oe_inline"/>
+                                    <field name="int2_desc" readonly="True" class="oe_inline"/>
+                                </div>
+                            </group>
+                        </group>
+                        <group colspan="4" string="Parameter values (date)">
+                            <group>
+                                <label for="date1" />
+                                <div>
+                                    <field name="date1" class="oe_inline"/>
+                                    <field name="date1_desc" readonly="True" class="oe_inline"/>
+                                </div>
+                            </group>
+                            <group>
+                                <label for="date2" />
+                                <div>
+                                    <field name="date2" class="oe_inline"/>
+                                    <field name="date2_desc" readonly="True" class="oe_inline"/>
+                                </div>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <!-- End Config details views-->
+
+        <!-- Start Branch details views-->
+
+         <record id="view_branch_tree" model="ir.ui.view">
+            <field name="name">Branch</field>
+            <field name="model">npa.branch</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="branch_type"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_branch_form" model="ir.ui.view">
+            <field name="name">Branch</field>
+            <field name="model">npa.branch</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group colspan="4">
+                            <group>
+                                <field name="name" required="True" attrs= "{'readonly' : [('state','!=','New')]}"/>
+                            </group>
+                        </group>
+                        <group colspan="4">
+                            <group>
+                                <field name="branch_type"/>
+                                <field name="mgr_name"/>
+                                <field name="calendar_id" options="{'no_open':True,'no_create':True}"/>
+                            </group>
+                            <group>
+                                <field name="state"/>
+                                <field name="mgr_email" widget="email" attrs="{'required':[('mgr_name','!=',False)]}"/>
+                                <field name="mgr_mobile" attrs="{'required':[('mgr_name','!=',False)]}"/>
+                            </group>
+                        </group>
+                        <group colspan="4">
+                            <field name="address1" string="Address" required='True'/>
+                            <field name="address2" string=" "/>
+                            <field name="address3" string=" "/>
+                        </group>
+                        <group colspan="4">
+                            <group>
+                                <field name="city"  attrs= "{'required' : [('address1','!=',False)]}"/>
+                                <field name="postcode"  attrs= "{'required' : [('address1','!=',False)]}"/>
+                            </group>
+                            <group>
+                                <field name="country_id" options="{'no_open':True,'no_create':True}" attrs= "{'required' : [('address1','!=',False)]}"/>
+                                <field name="state_id" required='True' options="{'no_open':True,'no_create':True}" domain="[('country_id','=',country_id)]"/>
+                            </group>
+                        </group>
+                        <group>
+                              <table style='width:100%;'>
+                                <tr>
+                                  <th style='width:7%;'><label for="create_date" string='Created:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="create_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="create_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td style='width:20%;'><field name="create_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                  <th style='width:7%;'><label for="write_date" string='Last updated:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="write_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="write_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td><field name="write_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                </tr>
+                             </table>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <!-- End Branch details views-->
+
+        <!-- End Calendar details views-->
+        <record id="view_calendar_tree" model="ir.ui.view">
+            <field name="name">Calendar</field>
+            <field name="model">npa.calendar</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="country_id"/>
+                    <field name="state_id"/>
+                    <field name="default_rec"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_calendar_form" model="ir.ui.view">
+            <field name="name">Calendar</field>
+            <field name="model">npa.calendar</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group colspan="4">
+                            <field name="name" required="True"/>
+                        </group>
+                        <group colspan="4">
+                            <group>
+                                <field name="country_id" required="True" options="{'no_open':True,'no_create':True}"/>
+                                <field name="state_id" options="{'no_open':True}" domain="[('country_id','=',country_id)]"/>
+                            </group>
+                            <group>
+                                <field name="default_rec"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page name="restdays" string="Restdays">
+                                <group colspan="4">
+                                    <group>
+                                        <field name="rest_on_mon"/>
+                                        <field name="rest_on_tue"/>
+                                        <field name="rest_on_wed"/>
+                                        <field name="rest_on_thu"/>
+                                    </group>
+                                    <group>
+                                        <field name="rest_on_fri"/>
+                                        <field name="rest_on_sat"/>
+                                        <field name="rest_on_sun"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page name="holidays" string="Holidays">
+                                <field name="holiday_ids" widget="one2many_list">
+                                    <tree editable="bottom" string="Calender_Holidays" default_order="date_start desc" limit="5">
+                                    <field name="date_start" string="Date" required='1'/>
+                                    <field name="holiday_type"/>
+                                    <field name="name" required='1'/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                        <group>
+                              <table style='width:100%;'>
+                                <tr>
+                                  <th style='width:7%;'><label for="create_date" string='Created:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="create_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="create_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td style='width:20%;'><field name="create_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                  <th style='width:7%;'><label for="write_date" string='Last updated:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="write_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="write_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td><field name="write_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                </tr>
+                             </table>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <!-- End Calendar details views-->
+
+        <record id="view_static_page_home" model="ir.ui.view">
+            <field name="name">npa common page home list</field>
+            <field name="model">npa.common_page</field>            
+            <field name="arch" type="xml">
+                <tree string="Home" create="false" edit="false" delete="false">
+			        <field name="name"/>
+                </tree>
+            </field>
+        </record>       
+
+    </data>
+</odoo>

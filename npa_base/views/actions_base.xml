@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Actions Person Title -->
+        <record id="action_npa_person_title" model="ir.actions.act_window">
+            <field name="name">Person title</field>
+            <field name="res_model">npa.common_code</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('code_type','=','PersonTitle')]</field>
+            <field name="context">{'default_code_type':'PersonTitle'}</field>
+            <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to create a new title for a person.
+            </p>
+            </field>
+        </record>
+
+       <!-- Actions ID Type-->
+        <record id="action_npa_id_type" model="ir.actions.act_window">
+            <field name="name">ID type</field>
+             <field name="res_model">npa.common_code</field>
+            <field name="view_mode">tree,form</field>
+            <field name="limit">25</field>
+            <field name="domain">[('code_type','=','IdType')]</field>
+            <field name="context">{'default_code_type':'IdType'}</field>
+            <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to create a new ID type.<br/><br/>
+              Note:  The ID type should be other than national ID.
+            </p>
+            </field>
+        </record>
+
+        <!-- Actions Publish Type-->
+        <record id="action_npa_publish_type" model="ir.actions.act_window">
+            <field name="name">Publish type</field>
+             <field name="res_model">npa.common_code</field>
+            <field name="view_mode">tree,form</field>
+            <field name="limit">25</field>
+            <field name="domain">[('code_type','=','PublishType')]</field>
+            <field name="context">{'default_code_type':'PublishType'}</field>
+            <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to create a new Publish type.<br/><br/>
+              Note:  The Publish type to know the printed edition is daily, weekly, monthly and so on.
+            </p>
+            </field>
+        </record>
+
+         <!-- Actions Publish Type-->
+        <record id="action_npa_publication_type" model="ir.actions.act_window">
+            <field name="name">Publication type</field>
+             <field name="res_model">npa.common_code</field>
+            <field name="view_mode">tree,form</field>
+            <field name="limit">25</field>
+            <field name="domain">[('code_type','=','PublicationType')]</field>
+            <field name="context">{'default_code_type':'PublicationType'}</field>
+            <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to create a new Publish type.<br/><br/>
+              Note:  The Publication type to know eithere newspaper or magazine.
+            </p>
+            </field>
+        </record>
+
+        <!-- Actions Config-->
+        <record id="action_npa_config" model="ir.actions.act_window">
+            <field name="name">Setup system configuration</field>
+            <field name="res_model">npa.config</field>
+            <field name="limit">25</field>
+            <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to create a new system configuration.
+            </p>
+            </field>
+        </record>
+
+        <!-- Actions Rsoute Details -->
+        <record id="action_npa_route_details" model="ir.actions.act_window">
+            <field name="name">Route Names</field>
+            <field name="res_model">npa.common_code</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('code_type','=','RouteDetails')]</field>
+            <field name="context">{'default_code_type':'RouteDetails'}</field>
+            <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to create a new staff route name.
+            </p>
+            </field>
+        </record>        
+
+        <!-- Actions Branch Details-->
+        <record id="action_npa_branch" model="ir.actions.act_window">
+            <field name="name">Setup branch</field>
+            <field name="res_model">npa.branch</field>
+            <field name="view_mode">tree,form</field>
+            <field name="limit">25</field>
+            <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to create a new branch.  There should be at least one branch that is the main branch.
+            </p>
+            </field>
+        </record>  
+
+        <!-- Actions Calendar Details-->
+        <record id="action_npa_calendar" model="ir.actions.act_window">
+            <field name="name">Setup calendar</field>
+            <field name="res_model">npa.calendar</field>
+            <field name="view_mode">tree,form</field>
+            <field name="limit">25</field>
+            <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to create a new calender.  There should be at least one calendar defined in the system.
+            </p>
+            </field>
+        </record>
+
+        <!-- <record id="open_home_static_page" model="ir.actions.act_window">
+            <field name="name">Home</field>
+            <field name="res_model">npa.common_page</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="context">{'hide_controlpannel':1}</field>
+            <field name="help" type="html">              
+                <div class="mov">
+                  <p>                         
+                    Select Your Desire Report 
+                  </p>
+                </div>
+            </field>
+		    </record>      -->
+
+    </data>
+</odoo>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--Main Menu Home -->
+        <menuitem id="menu_npa_home" name="Home" sequence="1"/>
+        
+        <!--Main Menu Configuration -->
+        <menuitem id="menu_npa_configuration" name="Apty Choice" sequence="8"/>
+
+        <!--Main Menu Report -->
+        <menuitem id="menu_npa_report" name="Report" sequence="10"/>
+
+        <!-- Configuration Sub Menu Setup -->
+        <menuitem id="menu_npa_setup" parent="menu_npa_configuration" name="Setup" sequence="2"/>        
+
+        <!-- Setup Sub Menu Person Title -->
+        <menuitem id="menu_npa_setup_person_title" parent="menu_npa_setup" sequence="2"
+            name="Person Title" action="action_npa_person_title"/>
+
+        <!-- Setup Sub Menu ID Type -->
+        <menuitem id="menu_npa_setup_id_type" parent="menu_npa_setup" sequence="4" 
+            name="ID Types" action="action_npa_id_type"/>
+        
+        <menuitem id="menu_npa_system" parent="menu_npa_configuration" name="System" sequence="4"/>
+
+        <menuitem id="menu_npa_config" parent="menu_npa_system" sequence="2" 
+        name="System Parameters" action="action_npa_config"/>
+
+        <menuitem id="menu_npa_setup_branch" parent="menu_npa_system" sequence="4"
+            name="Branch" action="action_npa_branch"/> 
+
+        <menuitem id="menu_npa_setup_calendar" parent="menu_npa_system" sequence="6"
+            name="Calendar" action="action_npa_calendar"/>        
+
+    </data>
+</odoo>

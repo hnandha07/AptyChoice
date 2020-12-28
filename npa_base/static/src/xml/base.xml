@@ -1,0 +1,99 @@
+<templates>
+	<t t-name="DashboardShare">
+		
+	</t>
+	<t t-name="DashboardEnterprise">
+
+	</t>
+	<t t-name="DashboardCompany">
+
+	</t>
+
+	<t t-name="Menu.link">
+		<t t-set="depth" t-value="(depth || 0) + 1"/>
+
+		<t t-if="!menu.children.length">
+			<t t-set="_link">
+				<a t-if="menu.name != 'Home'" role="menuitem" t-attf-href="#menu_id=#{menu.id}&amp;action=#{menu.action ? menu.action.split(',')[1] : ''}"
+					t-att-data-menu="menu.id"
+					t-att-data-action-model="menu.action ? menu.action.split(',')[0] : ''"
+					t-att-data-action-id="menu.action ? menu.action.split(',')[1] : ''"
+					t-att-data-menu-xmlid="menu.xmlid"
+					t-attf-class="#{inNavbar ? '' : 'dropdown-item '}o_menu_entry_lvl_#{depth}"
+					data-toggle="collapse" data-target="#o_navbar_collapse.in">
+					<span><t t-esc="menu.name"/></span>
+				</a>
+			</t>
+			<li t-if="inNavbar">
+				<t t-raw="_link"/>
+			</li>
+			<t t-else="">
+				<t t-raw="_link"/>
+			</t>
+		</t>
+		<t t-else="">
+			<div t-attf-class="dropdown-header o_menu_header_lvl_#{depth}">
+				<span><t t-esc="menu.name"/></span>
+			</div>
+			<t t-foreach="menu.children" t-as="menu">
+				<t t-call="Menu.link"/>
+			</t>
+		</t>
+	</t>
+
+	<t t-name="DashboardApps">
+	    <div class="text-center o_web_settings_dashboard_apps">
+	        <i class="fa fa-cog fa-4x text-muted o_browse_apps" style="cursor: pointer;" role="img" aria-label="Browse Apps" title="Browse Apps"></i>
+	        <div class="o_web_settings_dashboard_header">
+	            <t t-set="installed_apps" t-value="widget.data.installed_apps"/>
+	            <t t-if="installed_apps">
+	                <t t-esc="installed_apps"></t>
+	                <t t-if="installed_apps == 1">Installed App</t>
+	                <t t-if="installed_apps > 1">Installed Apps</t>
+	            </t>
+	            <t t-if="! installed_apps">
+	                No app installed
+	            </t>
+	        </div>
+	        <div>
+	            <a href="#" class="btn btn-primary btn-block o_browse_apps" role="button"><strong>Browse Apps</strong></a>
+	        </div>
+	        <div class="clearfix"/>
+	    </div>
+	</t>
+
+	<t t-name="DashboardMain">
+	    <div class="container-fluid py-2 o_web_settings_dashboard">
+	        <div class="form-row">
+	           <div class="col-12 col-lg-4 o_web_settings_dashboard_col">
+	                <div class="o_web_settings_dashboard_apps"></div>
+	            </div>
+	           <div class="col-12 col-lg-4 o_web_settings_dashboard_col">
+	           		<div class="o_web_settings_dashboard_translations"></div>
+	                <div class="o_web_settings_dashboard_company"></div>
+	            </div>
+	           <div class="col-12 col-lg-4 o_web_settings_dashboard_col">
+	           		<div class="o_web_settings_dashboard_invitations"></div>
+	                <div class="o_web_settings_dashboard_share"></div>
+	            </div>
+	        </div>
+	    </div>
+	</t>
+
+	<t t-name="UserMenu">
+		<div class="o_user_menu">
+			<img class="rounded-circle oe_topbar_avatar" t-att-src="_s + '/web/static/src/img/user_menu_avatar.png'" alt="Avatar"/>
+		</div>
+	    <div class="o_user_menu nametop">
+	    	<a role="menuitem" href="#" data-menu="settings">
+            	<span class="oe_topbar_name"/>
+            </a>
+	    </div>
+	    <div class="o_user_menu">
+		    <a role="menuitem" href="#" data-menu="logout" class="dropdown-item dropdown-logout">
+		    	<i class="fa fa-sign-out"></i>
+		    </a>
+		</div>
+	</t>
+
+</templates>

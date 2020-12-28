@@ -1,0 +1,11 @@
+.o_view_nocontent {
+    .o_nocontent_help {
+        @mixin o-init-image {
+            content: "";
+            display: block;
+            margin: auto;
+            background-size: cover;
+            background-color: #E6F375;
+        }        
+    }
+}

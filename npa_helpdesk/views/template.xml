@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<openerp>
+    <data>
+    	<template id="_assets_primary_variabless" inherit_id="web._assets_primary_variables">
+    	    <xpath expr="//link[last()]" position="after">
+    	        <link rel="stylesheet" type="text/scss" href="/npa_helpdesk/static/src/css/variables.scss"/>
+    	    </xpath>
+    	</template>
+
+        <template id="assets_backend" name="inherited_document_assets_backend" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+            	<script type="text/javascript" src="/npa_helpdesk/static/src/js/documents_viewer.js"/>
+                <script type="text/javascript" src="/npa_helpdesk/static/src/js/document_widget.js"/>
+                <link rel="stylesheet" type="text/scss" href="/npa_helpdesk/static/src/css/composer.scss"/>
+            </xpath>
+        </template>
+
+    </data>
+</openerp>

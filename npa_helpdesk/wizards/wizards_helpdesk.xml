@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Allow edit Doc pop up view form -->
+        <record id="edit_doc_wiz_form_view1" model="ir.ui.view">
+            <field name="name">Allow edit Doc</field>
+            <field name="model">npa.common_wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <p style="color:#FF6347"><b>Are you sure you want to allow edit this document? </b></p>
+                    <footer>
+                        <button name="edit_document" type="object" string="Allow edit" class="oe_highlight_activate"/>
+                        <button name="cancel" string="Cancel" special="cancel" class="oe_highlight_cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

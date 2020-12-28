@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Menu Helpdesk -->
+        <menuitem id="menu_npa_helpdesk" parent="npa_base.menu_npa_configuration" name="Helpdesk" sequence="6"/>
+
+        <!-- Menu Document -->
+        <menuitem id="menu_npa_document" parent="npa_base.menu_npa_configuration" name="Documents" sequence="8"/>
+
+        <!-- Helpdesk Sub Menu Case Category-->
+        <menuitem id="menu_npa_helpdesk_case_cat" parent="npa_base.menu_npa_setup"  
+                  name="Case Categories" action="action_npa_case_categ" sequence="2"/>
+
+        <!-- Helpdesk Sub Menu Case Type-->
+        <menuitem id="menu_npa_helpdesk_case_type" parent="npa_base.menu_npa_setup"  
+                  name="Case Types" action="action_npa_case_type" sequence="4"/>
+
+        <!-- Helpdesk Sub Menu Source-->
+        <menuitem id="menu_npa_helpdesk_source_type" parent="npa_base.menu_npa_setup"  
+                  name="Source Of Types" action="action_npa_source_type" sequence="6"/>        
+
+        <!-- Helpdesk Sub Menu Case Activity-->
+        <menuitem id="menu_npa_helpdesk_activity_type" parent="npa_base.menu_npa_setup"  
+                  name="Activity Types" action="action_npa_case_activity_type" sequence="8"/> 
+
+        <!-- Helpdesk Sub Menu Doc Classy-->
+        <menuitem id="menu_npa_setup_doc_class" parent="npa_base.menu_npa_setup" sequence="12"
+            name="Document Class" action="action_npa_doc_class"/> 
+
+        <!-- Helpdesk Sub Menu Doc Type-->
+        <menuitem id="menu_npa_setup_doc_type" parent="npa_base.menu_npa_setup" sequence="12"
+            name="Document Type" action="action_npa_doc_type"/> 
+
+        <!-- Document Menu -->
+        <menuitem id="menu_npa_doc_tran" parent="menu_npa_document" sequence="14"
+            name="Documents" action="action_npa_doc_tran"/>
+
+        <menuitem id="menu_mobile_db_doc" parent="menu_npa_document" sequence="14"
+            name="Dashboard Documents" action="action_mobile_db_doc"/>
+
+        <!-- Helpdesk Menu -->
+        <menuitem id="menu_npa_helpdesk_case" parent="menu_npa_helpdesk" sequence="51"
+                  name="Case Management" action="action_npa_case_mgmnt"/>     
+
+    </data>
+</odoo>

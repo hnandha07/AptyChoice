@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <template id="assets_backend" name="inherited_check_search_view_assets_backend" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">                 
+                <!--<link rel="stylesheet" href="/npa_base/static/src/css/npa_base.css"/>-->
+                <script type="text/javascript" src="/npa_base/static/src/js/checkbox_disable.js"/>                 
+                <!-- <script type="text/javascript" src="/npa_base/static/src/js/web_service.js"></script>                               -->
+            </xpath>
+        </template>
+    </data>
+</openerp>
