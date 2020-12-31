@@ -372,3 +372,142 @@ class common_page(models.Model):
 
     name = fields.Char('Name')
 
+class staff_details(models.Model):
+    _name = 'npa.staff_details'
+    _description = 'Staff details table'
+
+    @api.onchange('country_id')
+    def _onchange_country_id(self):
+        if self.country_id:
+            ids = self.env['res.country.state'].search([('country_id', '=', self.country_id.id)])
+            return {
+                'domain': {'state_id': [('id', 'in', ids.ids)],}
+            }
+        else:
+            self.state_id=False   
+
+    # Returns the default country
+    @api.model
+    def _get_default_country(self):
+        config_rec = self.env['npa.config'].search([('code_type','=','Sys'),('code','=','DftCountry')],limit=1)
+        if config_rec:
+            country_rec = self.env['res.country'].search([('code','=',config_rec.parm1)],limit=1)
+            if country_rec:
+                return country_rec.id
+        return
+
+    # Returns age of staff    
+    def _compute_birth_years(self):
+        for rec in self:
+            if rec.date_of_birth:
+                s = datetime.strptime(str(rec.date_of_birth),'%Y-%m-%d')
+                final = str(relativedelta(datetime.now(), s).years)+' Years'
+                rec.staff_age = final
+            if rec.create_date:
+                s1=datetime.strptime(str(rec.create_date).split('.')[0],"%Y-%m-%d %H:%M:%S")
+                final1 = str(s1.strftime('%Y-%m-%d %H:%M:%S'))+'('+str(relativedelta(datetime.now(), s1).years)+' Years,'+str(relativedelta(datetime.now(), s1).months)+' Months,'+str(relativedelta(datetime.now(), s1).days)+' Days)'
+                rec.customer_since = final1
+
+    # This function will derive a address field suitable for showing on display or report
+    @api.depends('address1','address2','city','zip_code','state_id','country_id')
+    def _get_publication_address(self):
+        for rec in self:
+            if rec.address1:
+                addr = rec.address1
+                if rec.address2:
+                    addr = addr+u',\n'+rec.address2               
+                if rec.city:
+                    addr = addr+u',\n'+rec.city
+                if rec.zip_code:
+                    addr = addr+u',\nPostcode '+rec.zip_code
+                if rec.state_id:
+                    addr = addr+u',\n'+rec.state_id.name
+                if rec.country_id:
+                    addr = addr+u',\n'+rec.country_id.name
+            else:
+                addr = u''
+                                                    
+            rec.display_address = addr
+
+    #field Validation
+    @api.constrains("email")
+    def customer_field_validation(self):
+        for rec in self:
+            if rec.email:
+                if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,}|[0-9]{1,3})(\\]?)$", rec.email) == None:
+                    raise ValidationError ("Invalid email address. Please enter a valid email address!")
+
+    # Disable the DUPLICATE button    
+    def copy(self):
+        raise ValidationError("Sorry you are unable to duplicate records")
+
+    # Perform a soft delete
+    def unlink(self):
+        for rec in self:
+            rec.active = False
+
+    # fields
+    name = fields.Char(string='Name',index=True)
+    code = fields.Char(string='Staff Code')
+    designation = fields.Selection([
+        ('Admin', 'Admin'),
+        ('Manager', 'Manager'),
+        ('Delivery Boy', 'Delivery Boy'),
+        ('Junior Chef', 'Junior Chef'),
+        ('Senior Chef', 'Senior Chef'), 
+        ('Clerk', 'Clerk'),      
+        ], string='Designation', default='Admin')
+    address1 = fields.Char(string='Address line 1')    
+    address2 = fields.Char(string='Address line 2')
+    city = fields.Char(string='City')  
+    state_id = fields.Many2one(comodel_name='res.country.state', string='State',ondelete='restrict')
+    country_id = fields.Many2one(comodel_name='res.country', string='Country',ondelete='restrict',default=_get_default_country)
+    zip_code = fields.Char(string='Zipcode or Pincode')
+    display_address = fields.Char(string='Publication Address',compute='_get_publication_address',store=True)
+    phone_num1 = fields.Char(string='Phone Number') 
+    phone_num2 = fields.Char(string='Alternate Number')
+    mobile_num1 = fields.Char(string='Mobile Number1') 
+    mobile_num2 = fields.Char(string='Mobile Number2')
+    whatsapp_num = fields.Char(string='WhatsApp Number')
+    web_site = fields.Char(string='Web Site')
+    email = fields.Char(string='eMail Address')
+    contact_person1 = fields.Char(string='Contact Person1')
+    person1_phone_num = fields.Char(string='Person1 Phone Num')
+    contact_person2 = fields.Char(string='Contact Person2')
+    person2_phone_num = fields.Char(string='Person2 Phone Num')
+    date_of_birth = fields.Date(string='Date of birth')
+    customer_since = fields.Char(store=False, compute="_compute_birth_years")
+    staff_age = fields.Char(string='Age', compute="_compute_birth_years")
+    gender = fields.Selection([
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+        ('N/A', 'Not applicable'),
+        ], string='Gender', default='Male')
+    marital_status = fields.Selection([
+        ('Single', 'Single'),
+        ('Married', 'Married'),        
+        ], string='Marital status', default='Single')
+    geolocation = fields.Char(string='Geo location',help='This can be a GPS location or some map reference')
+    geopicture = fields.Binary(string='Picture of geolocation',help='This is the picture of the location.  Can be screen capture of map.')
+    picture = fields.Binary(string='Picture',help='Attached picture will automatically be re-sized to 128x128px')
+    picture_small = fields.Binary(string='Picture small',compute='_reduce_customer_picture',store=True)
+    national_id_no = fields.Char(size=20,string='Naitional ID number',index=True)
+    national_id_type_id = fields.Many2one(comodel_name='npa.common_code',string='Naitional ID type',ondelete='restrict',domain="[('code_type','=','IdType')]")
+    national_id_expiry = fields.Date(string='National ID expiry')
+    other_id_no = fields.Char(size=20,string='Other ID number',index=True)
+    other_id_type_id = fields.Many2one(comodel_name='npa.common_code',string='Other ID type',ondelete='restrict',domain="[('code_type','=','IdType')]")
+    other_id_expiry = fields.Date(string='Other ID expiry date')
+    route_id = fields.Many2one(comodel_name='npa.common_code',string='Route Name',domain="[('code_type','=','RouteDetails')]")
+    login_domain = fields.Many2one(comodel_name='res.users',string='Login Domain')
+    active = fields.Boolean(string='Active',default=True)
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.user.company_id) 
+    # doc_ids= fields.One2many(comodel_name='npa.document',inverse_name='staff_id',string='Document Details')   
+
+    # SQL constraint
+    #_sql_constraints = [('unique_lookup_code','UNIQUE(customer_id,newspaper_id,active)','Lookup code must be unique')] 
+
+# Model for CUSTOMER LOGIN table
+# This model is to store the login information for each customer.
+# Login information is further separated by domain.  There would be at least one login domain (e.g. for member-site)
+# Targeted number of records: Large - average 1 record per customer
+

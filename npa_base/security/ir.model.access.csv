@@ -19,3 +19,5 @@ access_npa_common_page,access_npa_common_page,model_npa_common_page,,1,1,1,1
 "all_config","all.config","model_npa_config",,1,0,0,0
 "admin_config","admin.config","model_npa_config",npa_group_admin,1,1,1,1
 
+"all_staff_details","all.staff_details","model_npa_staff_details",,1,0,0,0
+"admin_staff_details","admin.staff_details","model_npa_staff_details",npa_group_admin,1,1,1,1

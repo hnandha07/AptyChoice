@@ -394,7 +394,124 @@
 			        <field name="name"/>
                 </tree>
             </field>
-        </record>       
+        </record> 
+
+        <!-- Start staff details views -->
+        <!-- Staff Details tree view-->
+        <record id="view_staff_details_tree" model="ir.ui.view">
+            <field name="name">staff details</field>
+            <field name="model">npa.staff_details</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <tree >
+                    <field name="name"/>
+                    <field name="route_id" />
+                    <field name="display_address"/>
+                    <field name="phone_num1"/>
+                    <field name="mobile_num1"/>
+                    <field name="email"/>                                       
+                </tree>
+            </field>
+        </record>
+
+        <!--  Staff details form view -->
+        <record id="view_setup_staff_details_form" model="ir.ui.view">
+            <field name="name">setup common - default form view</field>
+            <field name="model">npa.staff_details</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <field name="picture" widget='image' options='{"size": [150, 140]}' nolabel="1"/>                                
+                            </div>
+                            <div class="col-sm-5">
+                                <group>
+                                    <field name="name" required ="True"/>
+                                    <field name="code" required ="True"/>
+                                    <field name="gender" />                                    
+                                </group>
+                            </div>
+                             <div class="col-sm-5">
+                                <group>
+                                    <field name="designation"/>                                    
+                                    <field name="marital_status"/>
+                                    <field name="date_of_birth" required ="True"/>
+                                    <field name="staff_age" readonly="True"/>                                    
+                                </group>
+                            </div>
+                        </div>    
+                        <group string="Contact details">
+                            <group>                            
+                                <label for="street" string="Address"/>
+                                <div class="o_address_format">
+                                    <field name="address1" placeholder="Street..." class="o_address_street"/>
+                                    <field name="address2" placeholder="Street 2..." class="o_address_street"/>
+                                    <field name="city" placeholder="City" class="o_address_city"/>
+                                    <field name="state_id" class="o_address_state" placeholder="State" options="{'no_open':True,'no_create':True}"/>
+                                    <field name="zip_code" placeholder="ZIP" class="o_address_zip"/>
+                                    <field name="country_id" placeholder="Country" class="o_address_country" options="{'no_open':True,'no_create':True}"/>
+                                </div>
+                                <newline/>
+                                <label for="national_id_no"/>
+                                <div>
+                                    <field name="national_id_type_id" placeholder="ID type" class="oe_inline" options="{'no_open':True,'no_create':True}" domain="[('code_type','=','IdType')]" />
+                                    <field name="national_id_no" placeholder="ID Number" class="oe_inline" />
+                                    <field name="national_id_expiry" placeholder="Expiry Date" class="oe_inline" />                                    
+                                </div>                               
+                            </group>
+                            <group>
+                                <field name="email"/>
+                                <field name="whatsapp_num"/>
+                                <field name="mobile_num1"/>
+                                <field name="mobile_num2"/>                                
+                            </group>
+                        </group>
+                        <notebook>
+                            <page name="contact" string="Contact Details">
+                                <group>
+                                    <group>
+                                        <field name="phone_num1"/>
+                                        <field name="route_id" options="{'no_open':True,'no_create':True}" />                                             
+                                    </group>
+                                    <group>
+                                        <field name="phone_num2"/>
+                                        <field name="login_domain"/>                                            
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>           
+                        <group>
+                              <table style='width:100%; border-top: 1px solid #ccccff;'>
+                                <tr>
+                                  <th style='width:7%;'><label for="create_date" string='Created:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="create_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="create_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td style='width:20%;'><field name="create_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                  <th style='width:7%;'><label for="write_date" string='Last updated:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="write_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="write_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td><field name="write_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                </tr>
+                             </table>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Staff details search view -->
+        <record id="view_staff_details_search" model="ir.ui.view">
+            <field name="name">Search Staff Details</field>
+            <field name="model">npa.staff_details</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>      
 
     </data>
 </odoo>

@@ -33,5 +33,12 @@
         <menuitem id="menu_npa_setup_calendar" parent="menu_npa_system" sequence="6"
             name="Calendar" action="action_npa_calendar"/>        
 
+        <!--Main Sub Nenu -->
+        <menuitem id="menu_aapty_customers" parent="menu_npa_configuration" name="Apty Choice" sequence="4"/>  
+
+        <!-- Setup Sub Menu Staff Details -->
+        <menuitem id="menu_npa_staff_details" parent="menu_aapty_customers" sequence="2"
+            name="Staff Details" action="action_apty_staff_details"/>         
+
     </data>
 </odoo>

@@ -312,8 +312,7 @@ class document(models.Model):
         return False
     
     def move_to_trash(self, file_path, file_name):
-        '''This method moves the file to Trash DIrectory from the file_path provided.'''
-        
+        '''This method moves the file to Trash DIrectory from the file_path provided.'''        
         doc_directory_path = self.get_document_directory_path()
         trash_path = os.path.join(doc_directory_path, 'Trash')
         trash_file_path = os.path.join(trash_path, file_name)
@@ -437,6 +436,7 @@ class document(models.Model):
     notes = fields.Text(string='Notes and comments')
     date_valid = fields.Date(string='Valid until',help='This indicate until when the document content is valid.') 
     partner_id = fields.Many2one(comodel_name='res.partner', string='Customer',ondelete='cascade',index=True)
+    staff_id = fields.Many2one(comodel_name='npa.staff_details', string='Staff',ondelete='cascade',index=True)
     submit_date = fields.Datetime(string='Date/time submitted')
     submit_by = fields.Many2one(comodel_name='res.users',string='Submitted by',ondelete='restrict')
     approve_date = fields.Datetime(string='Date/time approved/rejected')
@@ -470,7 +470,7 @@ class document(models.Model):
     slide1 = fields.Binary('Slide 1', attachment=True)
     slide2 = fields.Binary('Slide 2', attachment=True)
     slide3 = fields.Binary('Slide 3', attachment=True)
-    header1 = fields.Char(string="Header 1")
+    header1 = fields.Char(string="Header")
     header2 = fields.Char(string="Header 2")
     header3 = fields.Char(string="Header 3")
     desc1 = fields.Char(string="Description 1")
@@ -495,6 +495,11 @@ class customer_details(models.Model):
     _inherit = 'res.partner'
 
     doc_ids= fields.One2many(comodel_name='npa.document',inverse_name='partner_id',string='Document Details')
+
+class staff_details(models.Model):
+    _inherit = 'npa.staff_details'
+
+    doc_ids= fields.One2many(comodel_name='npa.document',inverse_name='staff_id',string='Document Details')
 
  
 

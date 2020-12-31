@@ -130,5 +130,17 @@
             </field>
 		    </record>      -->
 
+        <!-- Actions Staff Details-->
+        <record id="action_apty_staff_details" model="ir.actions.act_window">
+            <field name="name">Staff details</field>
+            <field name="res_model">npa.staff_details</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to create a new staff details.
+            </p>
+            </field>
+        </record>
+
     </data>
 </odoo>
