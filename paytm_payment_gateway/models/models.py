@@ -87,7 +87,7 @@ class PaymentAcquirerAtom(models.Model):
     def __encode__(self,to_encode ,iv ,key):
         __pad__=lambda s:s + (16 - len (s) % 16) * chr (16 - len (s) % 16)
         # Pad
-        to_encode=__pad__ (to_encode)
+        to_encode=__pad__ (to_encode).encode()
         # Encrypt
         c=AES.new (key ,AES.MODE_CBC ,iv)
         to_encode=c.encrypt (to_encode)
@@ -139,7 +139,7 @@ class PaymentAcquirerAtom(models.Model):
 
 
     def generate_checksum_by_str(self,param_str ,merchant_key ,salt=None):
-        IV="@@@@&&&&####$$$$"
+        IV="@@@@&&&&####$$$$".encode()
         params_string=param_str
         salt=salt if salt else self.__id_generator__ (4)
         final_string='%s|%s' % (params_string ,salt)
@@ -149,7 +149,7 @@ class PaymentAcquirerAtom(models.Model):
 
         hash_string+=salt
 
-        return self.__encode__ (hash_string ,IV ,merchant_key)
+        return self.__encode__ (hash_string ,IV ,merchant_key.encode())
 
 
     def verify_checksum(self,param_dict ,merchant_key ,checksum):

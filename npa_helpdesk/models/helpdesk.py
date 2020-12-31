@@ -443,6 +443,8 @@ class document(models.Model):
     approve_by = fields.Many2one(comodel_name='res.users',string='Approved/rejected by',ondelete='restrict')
     archived_date = fields.Datetime(string='Date/time archived')
     archived_by = fields.Many2one(comodel_name='res.users',string='Archived by',ondelete='restrict')
+    document_sub_type = fields.Selection(string="Document Sub type", selection=[('panel', 'Panel'), ('slide', 'Slide')])
+    doc_image = fields.Binary(string="Document Image",  )
     document = fields.Binary('Document', attachment=True)
     permission = fields.Selection([
         ('Public', 'Public'),

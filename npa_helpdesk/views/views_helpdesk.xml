@@ -64,11 +64,13 @@
                                 <field name="name" required='1' attrs= "{'readonly' : [('state','!=','New')]}"/>
                                 <field name="file_name" invisible='1'/>
                                 <field name="doc_class_id" required='1' options="{'no_open':True,'no_create':True}" attrs="{'readonly' : [('state', '!=', 'New')]}"/>
-                                <field name="doc_class_id_code" invisible="True"/>                                
+                                <field name="doc_class_id_code" invisible="True"/>
+                                <field name="document_sub_type" attrs="{'required' : [('doc_class_id_code', '=', 'DOCHOME')]}"/>
                                 <field name="doc_type_id" invisible='True' options="{'no_open':True,'no_create':True}"/>
                                 <field name="doc_version" required='1' attrs= "{'readonly' : [('state','!=','New')]}"/>
                                 <field name="document" filename='file_name' attrs= "{'readonly' : [('state','!=','New')]}"/>
                                 <field name="file_name_related" readonly="1" required='1'/>
+                                <field name="doc_image" required='1'/>
                             </group>
                             <group>
                                 <field name="file_loc" widget='doc_url' readonly="1"/>

@@ -39,3 +39,11 @@ class AtomController(http.Controller):
         if post:
             request.env['payment.transaction'].sudo().form_feedback(post, 'paytm')
         return werkzeug.utils.redirect('/payment/process')
+
+    @http.route('/app/payment/confirm', type='json', auth='public')
+    def app_payment_confirm(self, **kwargs):
+        json_data = request.jsonrequest
+        if len(json_data) and json_data.get('payment_tx_id'):
+            payment_transaction = request.env['payment.transaction'].sudo().browse(int(json_data.get('payment_tx_id')))
+            payment_transaction._set_transaction_done()
+        return True

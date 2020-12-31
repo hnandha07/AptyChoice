@@ -34,6 +34,8 @@ class ResConfigSettings(models.TransientModel):
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    payment_acquirer_id = fields.Many2one("payment.acquirer", string="Payment Acquirer")
+
     @api.model
     def _get_order_details(self):
         order_lines = [{'product_id': ol.product_id.id,

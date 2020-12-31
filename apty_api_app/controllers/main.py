@@ -43,7 +43,7 @@ class WebsiteSale(WebsiteSale):
             if partner.id:
                 partner = partner.partner_id
                 partner_address.append(partner._get_address_values())
-                for child in partner.child_ids:
+                for child in partner.child_ids.filtered(lambda x:x.type == 'delivery' and x.active == True):
                     partner_address.append(child._get_address_values())
                 return partner_address
             else:
@@ -72,7 +72,12 @@ class WebsiteSale(WebsiteSale):
             if not partner_id.id:
                 raise UserWarning("Partner not found")
             if json_data.get('mode') == 'delete':
-                status = partner_id.unlink()
+                order = request.env['sale.order'].search([('partner_shipping_id','=',partner_id.id)])
+                if not len(order.ids):
+                    status = partner_id.unlink()
+                else:
+                    partner_id.active = False
+                    status = not partner_id.active
             if json_data.get('mode') == 'new':
                 values.update({
                     'company_id': False,
@@ -435,14 +440,49 @@ class Shop(Website):
         """
         return request.render('apty_api_app.mobile_aboutus',{})
 
-    @http.route('/app/home', type='http', auth='public')
+    @http.route('/app/home', type='json', auth='public')
     def get_home_page(self, **kwargs):
         """
         Render home page for App.
         :return: char, rendered home page template
         """
-        if kwargs.get('from_app', False):
-            return request.render('apty_api_app.home_page_content_app', {'from_app': True})
+        result = request.env['npa.document'].sudo().search_read([('doc_class_id.code', '=', 'DOCHOME')],
+                                                                   ['document_sub_type', 'name', 'notes'])
+        [r.update(image_url='/web/image/npa.document/{0}/doc_image'.format(r['id'])) for r in result]
+        return {'data':result}
+
+    @http.route('/app/payment', type='json', auth='public')
+    def app_payment(self, **kwargs):
+        try:
+            json_data = _get_json_values(fields_to_check=['order_id','payment_provider'])
+            payment_type = json_data.get('payment_provider')
+            order = request.env['sale.order'].sudo().browse(int(json_data.get('order_id')))
+            if not order.id:
+                raise UserWarning("Order not found")
+            partner_country_id = order.partner_id.country_id.id
+            partner_country_id = partner_country_id and partner_country_id or order.company_id.country_id.id
+            acquirer_id = request.env['payment.acquirer'].sudo().search([('provider','=',payment_type)])
+            if not acquirer_id.id:
+                raise UserWarning("Payment Acquirer not found")
+            payment_tx_id = request.env['payment.transcation']
+            py_transc = order._create_payment_transaction(
+                vals={'acquirer_id': acquirer_id.id, 'partner_country_id': partner_country_id})
+            if payment_type == 'cod':
+                order.action_confirm()
+                order._create_invoices()
+            else:
+                payment_tx_id = py_transc
+            order.write(payment_acquirer_id=acquirer_id.id)
+            return {
+                'status': 2001,
+                'payment_tx_id': payment_tx_id.id
+            }
+        except Exception as e:
+            _logger.info("Exception occurred while initiating app payment - {0}-{1}".format(e, json_data))
+            return {
+                'status': 2000,
+                'result': e
+            }
 
     @http.route('/app/shop/products', type='json', auth='public')
     def get_shop_products(self):
