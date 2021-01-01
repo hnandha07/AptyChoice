@@ -21,6 +21,10 @@
         <!-- Setup Sub Menu ID Type -->
         <menuitem id="menu_npa_setup_id_type" parent="menu_npa_setup" sequence="4" 
             name="ID Types" action="action_npa_id_type"/>
+
+        <!-- Setup Sub Menu Unit Type -->
+        <menuitem id="menu_npa_setup_unit_type" parent="menu_npa_setup" sequence="6" 
+            name="Unit Types" action="action_npa_unit_details"/>
         
         <menuitem id="menu_npa_system" parent="menu_npa_configuration" name="System" sequence="4"/>
 

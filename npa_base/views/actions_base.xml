@@ -76,12 +76,12 @@
         </record>
 
         <!-- Actions Rsoute Details -->
-        <record id="action_npa_route_details" model="ir.actions.act_window">
-            <field name="name">Route Names</field>
+        <record id="action_npa_unit_details" model="ir.actions.act_window">
+            <field name="name">Unit Type</field>
             <field name="res_model">npa.common_code</field>
             <field name="view_mode">tree,form</field>
-            <field name="domain">[('code_type','=','RouteDetails')]</field>
-            <field name="context">{'default_code_type':'RouteDetails'}</field>
+            <field name="domain">[('code_type','=','UnitId')]</field>
+            <field name="context">{'default_code_type':'UnitId'}</field>
             <field name="help" type="html">
             <p class="oe_view_nocontent_create">
               Click to create a new staff route name.

@@ -449,8 +449,8 @@
                                     <field name="address1" placeholder="Street..." class="o_address_street"/>
                                     <field name="address2" placeholder="Street 2..." class="o_address_street"/>
                                     <field name="city" placeholder="City" class="o_address_city"/>
-                                    <field name="state_id" class="o_address_state" placeholder="State" options="{'no_open':True,'no_create':True}"/>
                                     <field name="zip_code" placeholder="ZIP" class="o_address_zip"/>
+                                    <field name="state_id" class="o_address_state" placeholder="State" options="{'no_open':True,'no_create':True}"/>                                    
                                     <field name="country_id" placeholder="Country" class="o_address_country" options="{'no_open':True,'no_create':True}"/>
                                 </div>
                                 <newline/>
@@ -472,8 +472,8 @@
                             <page name="contact" string="Contact Details">
                                 <group>
                                     <group>
-                                        <field name="phone_num1"/>
-                                        <field name="route_id" options="{'no_open':True,'no_create':True}" />                                             
+                                        <field name="contact_person1"/>
+                                        <field name="phone_num1"/>                                                                                    
                                     </group>
                                     <group>
                                         <field name="phone_num2"/>
