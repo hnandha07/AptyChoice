@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from paytmchecksum.PaytmChecksum import generateSignatureByString
 import requests, json
 from pprint import pprint, pformat
 from odoo import http, _
