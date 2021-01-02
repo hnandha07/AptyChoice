@@ -62,18 +62,17 @@ class PaymentAcquirerAtom(models.Model):
     def paytm_get_form_action_url(self):
         return self._get_paytm_urls () ['paytm_form_url']
 
-    def paytm_form_generate_values(self ,values):
+    def paytm_form_generate_values(self ,values, CHANNEL_ID='WEB', ):
         self.ensure_one ()
         base_url=self.env ['ir.config_parameter'].sudo ().get_param ('web.base.url')
         now=datetime.now ()
-
         paytm_values=dict (
                           MID=self.paytm_merchant_id ,
                           ORDER_ID=str(values ['reference']) ,
                           CUST_ID = str(values.get('partner_id')),
                           INDUSTRY_TYPE_ID='Retail' ,
-                          CHANNEL_ID = 'WEB',
-                          TXN_AMOUNT=str(values ['amount']) ,
+                          CHANNEL_ID = CHANNEL_ID,
+                          TXN_AMOUNT=str(round(values['amount'], 2)) ,
                           WEBSITE='WEBSTAGING',
                           EMAIL=str(values.get ('partner_email')) ,
                           MOBILE_NO = str(values.get('partner_phone')),
@@ -215,3 +214,4 @@ class PaymentTransactionAtom(models.Model):
         else:
             self._set_transaction_pending ()
         return result
+

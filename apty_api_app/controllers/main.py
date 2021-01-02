@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from paytmchecksum.PaytmChecksum import generateSignatureByString
 import requests, json
 from pprint import pprint, pformat
 from odoo import http, _
@@ -464,23 +465,29 @@ class Shop(Website):
             acquirer_id = request.env['payment.acquirer'].sudo().search([('provider','=',payment_type)])
             if not acquirer_id.id:
                 raise UserWarning("Payment Acquirer not found")
-            payment_tx_id = request.env['payment.transcation']
+            payment_tx_id = request.env['payment.transaction']
             py_transc = order._create_payment_transaction(
                 vals={'acquirer_id': acquirer_id.id, 'partner_country_id': partner_country_id})
-            if payment_type == 'cod':
-                order.action_confirm()
-                order._create_invoices()
-            else:
-                payment_tx_id = py_transc
-            order.write(payment_acquirer_id=acquirer_id.id)
-            return {
-                'status': 2001,
-                'payment_tx_id': payment_tx_id.id
-            }
+            payment_values = {}
+            if py_transc.id:
+                if payment_type == 'cash_on_delivery':
+                    order.action_confirm()
+                    order._create_invoices()
+                elif payment_type == 'paytm':
+                    payment_values = acquirer_id._prepare_app_values(order_id=order, transaction=py_transc)
+                    method = getattr(acquirer_id, '{0}_form_generate_values'.format(acquirer_id.provider))
+                    payment_values = method(payment_values, CHANNEL_ID='WAP')
+                    payment_tx_id = py_transc
+                order.write({'payment_acquirer_id':acquirer_id.id})
+                return {
+                    'status': 2000,
+                    'payment_tx_id': payment_tx_id.id,
+                    'request_values':payment_values
+                }
         except Exception as e:
             _logger.info("Exception occurred while initiating app payment - {0}-{1}".format(e, json_data))
             return {
-                'status': 2000,
+                'status': 2001,
                 'result': e
             }
 

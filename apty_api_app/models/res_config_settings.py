@@ -31,19 +31,4 @@ class ResConfigSettings(models.TransientModel):
         self.env['ir.config_parameter'].sudo().set_param('apty_api_app.valid_regional_code_ids', self.valid_regional_code_ids.ids)
         super(ResConfigSettings, self).set_values()
 
-class SaleOrder(models.Model):
-    _inherit = 'sale.order'
 
-    payment_acquirer_id = fields.Many2one("payment.acquirer", string="Payment Acquirer")
-
-    @api.model
-    def _get_order_details(self):
-        order_lines = [{'product_id': ol.product_id.id,
-                        'product_image': '/web/image/product.product/{0}/image_128'.format(ol.product_id.id),
-                        'product_name': ol.product_id.name, 'qty': ol.product_uom_qty,
-                        'price': ol.price_unit, 'sub_total': ol.price_subtotal} for ol in self.order_line]
-        return {
-            'state': self.state,
-            'total': self.amount_total,
-            'order_lines': order_lines
-        }
