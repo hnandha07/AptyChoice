@@ -47,3 +47,10 @@ class AtomController(http.Controller):
             payment_transaction = request.env['payment.transaction'].sudo().browse(int(json_data.get('payment_tx_id')))
             payment_transaction._set_transaction_done()
         return True
+
+
+
+
+
+
+    

@@ -8,7 +8,8 @@ class ProductTemplate(models.Model):
 
     is_available_full_day = fields.Boolean(string="Is Available Full Day", )
     is_available = fields.Boolean(string="Is Available", )
-    availability_time = fields.Float(string="Availability Time", )
+    availability_time_start = fields.Float(string="Availability Time Start", )
+    availability_time_end = fields.Float(string="Availability Time End", )
 
 
 class ResCompany(models.Model):

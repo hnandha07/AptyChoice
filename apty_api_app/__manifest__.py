@@ -18,5 +18,6 @@
         'views/home_page_view.xml',
         'views/product_template_view.xml',
         'views/res_config_settings_view.xml',
+        'views/kitchen_screen_view.xml',
     ],
 }

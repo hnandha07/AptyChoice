@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import fields, models, api
-
+from odoo import fields, models, api, _
+from odoo.exceptions import _logger,ValidationError
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -19,6 +19,43 @@ class SaleOrder(models.Model):
             'total': self.amount_total,
             'order_lines': order_lines
         }
+
+    def action_confirm(self):
+        res = super(SaleOrder, self).action_confirm()
+        self.write({
+            'apty_order_state':'order',
+        })
+        return  res
+
+    def prepare_order_lines(self, ol_details=[]):
+        order_lines = []
+        if len(ol_details) and self.id:
+            if not len(self.order_line):
+                for old in ol_details:
+                    order_lines.append((0,0,{
+                        'product_id':old.get('product_id'),
+                        'product_uom_qty':old.get('qty'),
+                    }))
+            else:
+                for old in ol_details:
+                    product = old.get('product_id')
+                    write_action = 3
+                    ol = self.order_line.filtered(lambda x:x.product_id.id == product).id
+                    if not ol:
+                        write_action, ol = 0, 0
+                    values = {'product_id':product,'product_uom_qty':old.get('qty')}
+                    order_lines.append((write_action,ol,values))
+                check_product_ids = map(lambda x:x.get('product_id'),ol_details)
+                remove_lines = self.order_line.filtered(lambda x:x.product_id.id not in check_product_ids)
+                if len(remove_lines.ids):
+                    _logger.info(
+                        "Removing order lines - {0} with product - {1} for order - {2}".format(remove_lines.mapped('id'),
+                                                                                               remove_lines.mapped(
+                                                                                                   'product_id.name'),
+                                                                                               self.name))
+
+                    order_lines += [(2, rol.id) for rol in remove_lines]
+        return order_lines
 
 
 class PaymentAcquirer(models.Model):

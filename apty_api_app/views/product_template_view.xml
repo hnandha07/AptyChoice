@@ -10,7 +10,10 @@
                <xpath expr="//field[@name='categ_id']" position="after">
                    <field name="is_available"/>
                    <field name="is_available_full_day"/>
-                   <field name="availability_time" widget="float_time" attrs="{
+                   <field name="availability_time_start" widget="float_time" attrs="{
+                    'invisible': [('is_available_full_day','=', False)]
+                   }"/>
+                   <field name="availability_time_end" widget="float_time" attrs="{
                     'invisible': [('is_available_full_day','=', False)]
                    }"/>
                </xpath>

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import requests, json
+from datetime import datetime
 from pprint import pprint, pformat
 from odoo import http, _
 from odoo.http import request
@@ -164,6 +165,7 @@ class WebsiteSale(WebsiteSale):
         try:
             json_data = _get_json_values(fields_to_check=['user_id','mode'])
             mode = json_data.get('mode')
+            ctx = request.env.context.copy()
             user = request.env['res.users'].sudo().browse(int(json_data.get('user_id')))
             if not user.id:
                 return {
@@ -180,30 +182,22 @@ class WebsiteSale(WebsiteSale):
                 })
             order_lines = []
             if mode == 'new':
+                request.session.sale_order_id = False
                 order = request.website.with_user(user=user).sale_get_order(force_create=1)
             elif mode == 'edit':
                 order = request.env['sale.order'].browse(int(json_data.get('order_id'))).sudo()
-                order.order_line.unlink()
             if not order.id:
                 raise UserWarning("Order not found")
-            for old in json_data.get('order_line_details',[]):
-                order_lines.append((0, 0, {
-                    'product_id': old.get('product_id'),
-                    'product_uom_qty': old.get('qty'),
-                }))
-            ctx = request.env.context.copy()
+            order_lines = order.prepare_order_lines(ol_details= json_data.get('order_line_details',[]))
             ctx.update({
                 'force_company': order.company_id.id,
                 'allowed_company_ids':[order.company_id.id]
             })
-            values = {
-                'order_line': order_lines
-            }
-            if len(json_data.get('delivery_date','')):
-                values.update({
-                    'commitment_date': json_data.get('delivery_date')
-                })
-            order.sudo().with_context(ctx).write(values)
+            order.sudo().with_context(ctx).write({
+                'order_line': order_lines,
+                'commitment_date': len(json_data.get('delivery_date', '')) and json_data.get('delivery_date',
+                                                                                             '') or datetime.today()
+            })
             return {'order_id':order.id}
         except Exception as e:
             return {
@@ -493,6 +487,8 @@ class Shop(Website):
     @http.route('/app/shop/products', type='json', auth='public')
     def get_shop_products(self):
         json_data = request.jsonrequest
+        fields = ['id', 'display_name', 'lst_price', 'is_available', 'is_available_full_day', 'availability_time_start',
+                  'availability_time_end']
         offset = json_data.get('scroll_count', 0) * 10
         product_obj = request.env['product.product'].sudo()
         order = 'create_date'
@@ -503,9 +499,8 @@ class Shop(Website):
             domain += [('name', 'ilike', json_data.get('custom_search_keyword'))]
         if json_data.get('sort_by', False) :
             order = '{0}'.format(json_data.get('sort_by', False))
-        product_obj = product_obj.search_read(domain=domain,
-                                                fields=['id', 'display_name', 'lst_price'],
-                                                offset=offset, limit=10, order=order)
+        product_obj = product_obj.search_read(domain=domain, fields=fields,
+                                              offset=offset, limit=10, order=order)
         for product in product_obj:
             product.update({
                 'image_url': '/web/image/product.product/{0}/image_128'.format(product['id'])

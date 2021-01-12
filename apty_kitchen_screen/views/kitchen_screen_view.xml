@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template name="KitchenScreenTemplate" id="kitchen_screen_template">
+            <section>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-header">
+
+                                </div>
+                                <div class="card-body">
+                                    <div class="card-title">
+
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </template>
+
+        <record id="action_kitchen_screen" model="ir.actions.client">
+            <field name="name">Kitchen Screen</field>
+            <field name="tag">kitchen_screen</field>
+            <field name="context" eval="{'model': 'apty.kitchen.screen'}" />
+        </record>
+
+        <menuitem id="kitchen_screen_main_menu" name="Kitchen" parent="npa_base.menu_npa_configuration"
+                  action="action_kitchen_screen"
+                  sequence="5"/>
+
+    </data>
+</odoo>
