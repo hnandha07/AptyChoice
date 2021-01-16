@@ -7,15 +7,15 @@
            <field name="model">product.template</field>
            <field name="inherit_id" ref="product.product_template_form_view"/>
            <field name="arch" type="xml">
+               <xpath expr="//div[@name='options']" position="inside">
+                   <div>
+                       <field name="is_available"/>
+                       <label for="is_available"/>
+                   </div>
+               </xpath>
                <xpath expr="//field[@name='categ_id']" position="after">
-                   <field name="is_available"/>
-                   <field name="is_available_full_day"/>
-                   <field name="availability_time_start" widget="float_time" attrs="{
-                    'invisible': [('is_available_full_day','=', False)]
-                   }"/>
-                   <field name="availability_time_end" widget="float_time" attrs="{
-                    'invisible': [('is_available_full_day','=', False)]
-                   }"/>
+                   <field name="availability_time_start" widget="float_time" string="Start Time"/>
+                   <field name="availability_time_end" widget="float_time" string="End Time"/>
                </xpath>
            </field>
        </record>

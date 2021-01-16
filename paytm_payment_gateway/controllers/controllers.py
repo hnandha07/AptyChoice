@@ -43,11 +43,13 @@ class AtomController(http.Controller):
     @http.route('/app/payment/confirm', type='json', auth='public')
     def app_payment_confirm(self, **kwargs):
         json_data = request.jsonrequest
+        staus = False
+        _logger.info("Payment Confirm JSON Data".format(pprint.pformat(json_data)))
         if len(json_data) and json_data.get('payment_tx_id'):
             payment_transaction = request.env['payment.transaction'].sudo().browse(int(json_data.get('payment_tx_id')))
-            payment_transaction._set_transaction_done()
-        return True
-
+            payment_transaction._reconcile_after_transaction_done()
+            staus = True
+        return staus
 
 
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests, json
-from datetime import datetime
+from pytz import timezone
+from datetime import datetime, timedelta
 from pprint import pprint, pformat
 from odoo import http, _
 from odoo.http import request
@@ -136,7 +137,6 @@ class WebsiteSale(WebsiteSale):
                 return order._get_order_details()
             domain = [('partner_id', '=', user_id.partner_id.id)]
             order_obj = request.env['sale.order'].sudo()
-            # domain += [('state', 'in', [status[0] for status in order_obj._fields['state'].selection])]
             orders = order_obj.search_read(domain=domain,
                                                 fields=['id', 'display_name', 'date_order', 'amount_total', 'state'],
                                                 offset=offset, limit=10, order='create_date desc')
@@ -164,6 +164,7 @@ class WebsiteSale(WebsiteSale):
     def app_add_order(self):
         try:
             json_data = _get_json_values(fields_to_check=['user_id','mode'])
+            values ={}
             mode = json_data.get('mode')
             ctx = request.env.context.copy()
             user = request.env['res.users'].sudo().browse(int(json_data.get('user_id')))
@@ -177,8 +178,8 @@ class WebsiteSale(WebsiteSale):
                 order = request.env['sale.order'].browse(int(json_data.get('order_id'))).sudo()
                 if not order.id:
                     raise UserWarning("Order not found")
-                order.write({
-                    'partner_shipping_id': int(json_data.get('partner_id'))
+                values.update({
+                    'partner_shipping_id':int(json_data.get('partner_id'))
                 })
             order_lines = []
             if mode == 'new':
@@ -188,16 +189,20 @@ class WebsiteSale(WebsiteSale):
                 order = request.env['sale.order'].browse(int(json_data.get('order_id'))).sudo()
             if not order.id:
                 raise UserWarning("Order not found")
-            order_lines = order.prepare_order_lines(ol_details= json_data.get('order_line_details',[]))
+            if len(json_data.get('order_line_details',[])):
+                order_lines = order.prepare_order_lines(ol_details= json_data.get('order_line_details',[]))
+                values={
+                    'order_line': order_lines
+                }
+            if len(json_data.get('delivery_date', '')):
+                values.update({
+                    'commitment_date': json_data.get('delivery_date')
+                })
             ctx.update({
                 'force_company': order.company_id.id,
                 'allowed_company_ids':[order.company_id.id]
             })
-            order.sudo().with_context(ctx).write({
-                'order_line': order_lines,
-                'commitment_date': len(json_data.get('delivery_date', '')) and json_data.get('delivery_date',
-                                                                                             '') or datetime.today()
-            })
+            order.sudo().with_context(ctx).write(values)
             return {'order_id':order.id}
         except Exception as e:
             return {
@@ -454,28 +459,21 @@ class Shop(Website):
             if not order.id:
                 raise UserWarning("Order not found")
             partner_country_id = order.partner_id.country_id.id
-            partner_country_id = partner_country_id and partner_country_id or order.company_id.country_id.id
+            partner_country_ifcd = partner_country_id and partner_country_id or order.company_id.country_id.id
             acquirer_id = request.env['payment.acquirer'].sudo().search([('provider','=',payment_type)])
             if not acquirer_id.id:
                 raise UserWarning("Payment Acquirer not found")
             payment_tx_id = request.env['payment.transaction']
             py_transc = order._create_payment_transaction(
                 vals={'acquirer_id': acquirer_id.id, 'partner_country_id': partner_country_id})
-            payment_values = {}
             if py_transc.id:
                 if payment_type == 'cash_on_delivery':
                     order.action_confirm()
                     order._create_invoices()
-                elif payment_type == 'paytm':
-                    payment_values = acquirer_id._prepare_app_values(order_id=order, transaction=py_transc)
-                    method = getattr(acquirer_id, '{0}_form_generate_values'.format(acquirer_id.provider))
-                    payment_values = method(payment_values, CHANNEL_ID='WAP')
-                    payment_tx_id = py_transc
                 order.write({'payment_acquirer_id':acquirer_id.id})
                 return {
                     'status': 2000,
-                    'payment_tx_id': payment_tx_id.id,
-                    'request_values':payment_values
+                    'payment_tx_id': py_transc.id,
                 }
         except Exception as e:
             _logger.info("Exception occurred while initiating app payment - {0}-{1}".format(e, json_data))
@@ -486,13 +484,13 @@ class Shop(Website):
 
     @http.route('/app/shop/products', type='json', auth='public')
     def get_shop_products(self):
+        current_time = datetime.now(timezone('UTC')).astimezone(timezone('Asia/Kolkata'))
         json_data = request.jsonrequest
-        fields = ['id', 'display_name', 'lst_price', 'is_available', 'is_available_full_day', 'availability_time_start',
-                  'availability_time_end']
+        fields = ['id', 'display_name', 'lst_price', 'availability_time_start', 'availability_time_end']
         offset = json_data.get('scroll_count', 0) * 10
         product_obj = request.env['product.product'].sudo()
         order = 'create_date'
-        domain = [('active', '=', True)]
+        domain = [('active', '=', True),('is_available','=', True)]
         if json_data.get('filter_by_category', False):
             domain += [('categ_id', 'in', json_data.get('categ_ids',[]))]
         if json_data.get('custom_search', False) and json_data.get('custom_search_keyword', False):
@@ -502,8 +500,15 @@ class Shop(Website):
         product_obj = product_obj.search_read(domain=domain, fields=fields,
                                               offset=offset, limit=10, order=order)
         for product in product_obj:
+            is_available = False
+            current_time_delta = timedelta(hours=current_time.hour,minutes=current_time.minute).seconds/3600
+            start_time = product['availability_time_start']
+            end_time = product['availability_time_end']
+            if start_time < current_time_delta < end_time :
+                is_available = True
             product.update({
-                'image_url': '/web/image/product.product/{0}/image_128'.format(product['id'])
+                'image_url': '/web/image/product.product/{0}/image_128'.format(product['id']),
+                'is_available': is_available
             })
         return {
             'products': product_obj,

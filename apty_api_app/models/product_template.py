@@ -6,7 +6,6 @@ from odoo import fields, models, api
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    is_available_full_day = fields.Boolean(string="Is Available Full Day", )
     is_available = fields.Boolean(string="Is Available", )
     availability_time_start = fields.Float(string="Availability Time Start", )
     availability_time_end = fields.Float(string="Availability Time End", )

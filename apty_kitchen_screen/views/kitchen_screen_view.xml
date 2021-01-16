@@ -1,26 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <template name="KitchenScreenTemplate" id="kitchen_screen_template">
-            <section>
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="card">
-                                <div class="card-header">
-
+        <template name="kitchen Screen Fail Template" id="ks_fail_template">
+            <div class="row">
+                <div class="col-12 display-flex text-center">
+                    <p>
+                        <t t-esc="msg"/>
+                    </p>
+                </div>
+            </div>
+        </template>
+        <template name="Kitchen Screen Order Template" id="ks_order_template">
+            <div class="row">
+                <t t-foreach="data" t-as="kd">
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <t t-esc="kd"/>
+<!--                                <t t-esc="data[kd][0].get('so_name')"/>-->
+                            </div>
+                            <div class="card-body">
+                                <div class="card-title">
                                 </div>
-                                <div class="card-body">
-                                    <div class="card-title">
-
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-
-                                </div>
+                            </div>
+                            <div class="card-footer">
                             </div>
                         </div>
                     </div>
+                </t>
+            </div>
+        </template>
+        <template name="KitchenScreenTemplate" id="kitchen_screen_template">
+            <section>
+                <div class="container">
+                    <t t-if="status">
+                        <t t-if="len(data)">
+                            <t t-call="apty_kitchen_screen.ks_order_template"/>
+                        </t>
+                        <t t-else="">
+                            <t t-call="apty_kitchen_screen.ks_fail_template">
+                                <t t-set="msg" t-value="'No orders available yet'"/>
+                            </t>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <t t-call="apty_kitchen_screen.ks_fail_template">
+                            <t t-set="msg" t-value="'Sorry could not load Orders.'"/>
+                        </t>
+                    </t>
                 </div>
             </section>
         </template>

@@ -16,8 +16,10 @@ class SaleOrder(models.Model):
                         'price': ol.price_unit, 'sub_total': ol.price_subtotal} for ol in self.order_line]
         return {
             'state': self.state,
-            'total': self.amount_total,
-            'order_lines': order_lines
+            'order_lines': order_lines,
+            'amount_untaxed': self.amount_untaxed,
+            'taxes': self.amount_tax,
+            'total': self.amount_total
         }
 
     def action_confirm(self):
@@ -41,6 +43,8 @@ class SaleOrder(models.Model):
                     product = old.get('product_id')
                     write_action = 3
                     ol = self.order_line.filtered(lambda x:x.product_id.id == product).id
+                    if ol:
+                        write_action = 1
                     if not ol:
                         write_action, ol = 0, 0
                     values = {'product_id':product,'product_uom_qty':old.get('qty')}

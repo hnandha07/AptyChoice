@@ -24,12 +24,10 @@ odoo.define('apty_kitchen_screen.kitchen_screen', function (require) {
                 args: [context.id],
                 context: context,
             }).then(function (result) {
-                console.log(result)
-                // return self.parse_reports_informations(result);
+                var content_div = $('.o_content')
+                content_div.empty();
+                content_div.html(result)
             });
-            // return Promise.all([extra_info, this._super.apply(this, arguments)]).then(function () {
-            //     self.render();
-            // });
         }
     });
     core.action_registry.add('kitchen_screen', kitchenScreenWidget);
