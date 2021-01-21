@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="npa_config_delivery" model="npa.config">
+            <field name="name">Delivery Charge</field>
+            <field name="code">DeliveryCharge</field>
+            <field name="code_type">Sys</field>
+            <field name="parm1">km &#60; 1</field>
+            <field name="parm2">km &#62; 1 and km &#60; 5</field>
+            <field name="parm3">km &#62; 5 and km &#60; 10</field>
+            <field name="amt1">0.00</field>
+            <field name="amt2">10.00</field>
+            <field name="amt3">15.00</field>
+        </record>
+    </data>
+</odoo>

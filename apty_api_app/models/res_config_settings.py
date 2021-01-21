@@ -14,6 +14,7 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     sms_api_key = fields.Char(string="SMS API Key")
+    google_distance_url = fields.Char(string="Google Distance API")
     valid_regional_code_ids = fields.Many2many(comodel_name="regional.postal.code", string="Valid Regional Code", )
 
     @api.model
@@ -22,13 +23,16 @@ class ResConfigSettings(models.TransientModel):
         res = super(ResConfigSettings, self).get_values()
         res.update({
             'sms_api_key':conf_obj.get_param('apty_api_app.sms_api_key'),
-            'valid_regional_code_ids':[(6, 0 , eval(conf_obj.get_param('apty_api_app.valid_regional_code_ids','[]')))]
+            'valid_regional_code_ids':[(6, 0 , eval(conf_obj.get_param('apty_api_app.valid_regional_code_ids','[]')))],
+            'google_distance_url':conf_obj.get_param('apty_api_app.google_distance_url','')
         })
         return res
 
     def set_values(self):
         self.env['ir.config_parameter'].sudo().set_param('apty_api_app.sms_api_key', self.sms_api_key)
-        self.env['ir.config_parameter'].sudo().set_param('apty_api_app.valid_regional_code_ids', self.valid_regional_code_ids.ids)
+        self.env['ir.config_parameter'].sudo().set_param('apty_api_app.valid_regional_code_ids',
+                                                         self.valid_regional_code_ids.ids)
+        self.env['ir.config_parameter'].sudo().set_param('apty_api_app.google_distance_url', self.google_distance_url)
         super(ResConfigSettings, self).set_values()
 
 

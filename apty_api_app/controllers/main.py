@@ -11,7 +11,6 @@ from odoo.addons.website_form.controllers.main import WebsiteForm
 from odoo.addons.auth_signup.controllers.main import AuthSignupHome
 from odoo.addons.website_sale.controllers.main import WebsiteSale
 
-
 def _get_json_values(fields_to_check=[]):
     json_data = request.jsonrequest
     if not len(json_data) or (len(fields_to_check) and not all([json_data.get(ftc, False) for ftc in fields_to_check])):
@@ -470,11 +469,18 @@ class Shop(Website):
                 if payment_type == 'cash_on_delivery':
                     order.action_confirm()
                     order._create_invoices()
-                order.write({'payment_acquirer_id':acquirer_id.id})
-                return {
-                    'status': 2000,
-                    'payment_tx_id': py_transc.id,
-                }
+                elif payment_type == 'paytm':
+                    payment_values = acquirer_id._prepare_app_values(order_id=order, transaction=py_transc)
+                    method = getattr(acquirer_id, '{0}_form_generate_values'.format(acquirer_id.provider))
+                    payment_values = method(payment_values, CHANNEL_ID='WAP')
+                    payment_tx_id = py_transc
+            order.write({'payment_acquirer_id':acquirer_id.id})
+            return {
+                'status': 2000,
+                'payment_tx_id': payment_tx_id.id,
+                'request_values':payment_values,
+                'payment_tx_id': py_transc.id,
+            }
         except Exception as e:
             _logger.info("Exception occurred while initiating app payment - {0}-{1}".format(e, json_data))
             return {

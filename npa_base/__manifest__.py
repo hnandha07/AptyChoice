@@ -24,7 +24,8 @@ can be performed.
         'views/views_base.xml',        
         'views/actions_base.xml',
         'views/menus_base.xml',
-        'views/template.xml',                       
+        'views/template.xml',
+        'data/npa_config_delivery.xml'
     ],    
     'qweb': ['static/src/xml/temp.xml', "static/src/xml/base.xml"],
     'installable': True,

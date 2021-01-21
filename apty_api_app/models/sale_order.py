@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import json
+from urllib.parse import urlencode
+from requests import request as py_request
+from odoo.tools.safe_eval import safe_eval
 from odoo import fields, models, api, _
 from odoo.exceptions import _logger,ValidationError
 
@@ -21,6 +25,84 @@ class SaleOrder(models.Model):
             'taxes': self.amount_tax,
             'total': self.amount_total
         }
+
+    def get_google_distance(self, partner_cords=[], company_cords=[]):
+        if len(partner_cords) == 2 and len(company_cords) == 2:
+            config_obj = self.env['ir.config_parameter'].sudo()
+            api_key = config_obj.get_param('base_geolocalize.google_map_api_key', '')
+            api_url = config_obj.get_param('apty_api_app.google_distance_url', '')
+            if not all([len(api_url), len(api_key)]):
+                raise ("Configuration missing for google distance API key-{0} ---- URL-{1}".format(api_key, api_url))
+            query_string = urlencode({
+                'key': api_key,
+                'units': 'metric',
+                'origins': ','.join(company_cords),
+                'destinations': ','.join(partner_cords),
+            })
+            google_map_url = "{}?{}".format(api_url, query_string)
+            response = py_request("GET",url=google_map_url, data={}, headers={})
+            if response.status_code:
+                json_response = json.loads(response.text)
+                response_distance = []
+                rows = json_response.get('rows')
+                for row in rows:
+                    response_distance.append(self._get_rows_distance(row))
+                return min(response_distance)
+
+    def _get_rows_distance(self, row=False):
+        return row['elements'][0]['distance']['value']
+
+    def calc_distance_amt(self, geo_distance=0):
+        amount = 0
+        if geo_distance > 0:
+            delivery_config = self.env.ref('npa_base.npa_config_delivery', raise_if_not_found=False)
+            if delivery_config.id:
+                for record in range(1, 4):
+                    condition = getattr(delivery_config, 'parm{}'.format(record),'').lower()
+                    if len(condition) and 'km' in condition:
+                        condition = condition.replace('km', str(geo_distance))
+                        result = safe_eval(condition)
+                        if result:
+                            amount = getattr(delivery_config,'amt{}'.format(record),0)
+                            break;
+        return amount
+
+    def get_shipping_amount(self, partner_id=False):
+        try:
+            if partner_id and partner_id.id:
+                partner_id.geo_localize()
+                search_cords = self.partner_id.search_read([('id', 'in', [partner_id.id, self.company_id.partner_id.id])],
+                                                           ['partner_latitude', 'partner_longitude'],order='id asc')
+                partner_cords = [str(search_cords[-1].get(sco)) for sco in ['partner_latitude','partner_longitude']]
+                company_cords = [str(search_cords[0].get(sco)) for sco in ['partner_latitude','partner_longitude']]
+                geo_distance = self.get_google_distance(partner_cords=partner_cords,company_cords=company_cords)
+                geo_distance = geo_distance/1000
+                return self.calc_distance_amt(geo_distance=geo_distance)
+        except Exception as e:
+            _logger.info("Exception occurred while getting distance {0}".format(e))
+
+    def write(self, values):
+        res = super(SaleOrder, self).write(values)
+        if values.get('partner_shipping_id', False):
+            for record in self:
+                partner = self.partner_shipping_id.browse(values.get('partner_shipping_id'))
+                delivery_price = self.get_shipping_amount(partner_id=partner)
+                if not partner.id:
+                    _logger.info("Could not find the partner for the order.")
+                delivery_product = self.env.ref('delivery.product_product_delivery_product_template')
+                delivery_line = self.order_line.filtered(lambda x:x.product_id.product_tmpl_id.id == delivery_product.id)
+                if not delivery_line.id:
+                    delivery_line.create({
+                        'product_id': delivery_product.product_variant_ids.id,
+                        'product_uom_qty': 1.0,
+                        'price_unit':delivery_price,
+                        'order_id':self.id,
+                    })
+                else:
+                    delivery_line.write({
+                        'price_unit': delivery_price
+                    })
+        return res
 
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
