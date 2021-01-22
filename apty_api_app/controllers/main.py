@@ -201,7 +201,8 @@ class WebsiteSale(WebsiteSale):
                 'force_company': order.company_id.id,
                 'allowed_company_ids':[order.company_id.id]
             })
-            order.with_user(user).with_context(ctx).write(values)
+            request.env.user = user
+            order.sudo().with_context(ctx).write(values)
             return {'order_id':order.id}
         except Exception as e:
             return {
@@ -465,21 +466,24 @@ class Shop(Website):
             payment_tx_id = request.env['payment.transaction']
             py_transc = order._create_payment_transaction(
                 vals={'acquirer_id': acquirer_id.id, 'partner_country_id': partner_country_id})
+            payment_values = {}
             if py_transc.id:
                 if payment_type == 'cash_on_delivery':
                     order.action_confirm()
                     order._create_invoices()
+                    py_transc = False
                 elif payment_type == 'paytm':
                     payment_values = acquirer_id._prepare_app_values(order_id=order, transaction=py_transc)
                     method = getattr(acquirer_id, '{0}_form_generate_values'.format(acquirer_id.provider))
                     payment_values = method(payment_values, CHANNEL_ID='WAP')
                     payment_tx_id = py_transc
+                    py_transc = py_transc.id
             order.write({'payment_acquirer_id':acquirer_id.id})
             return {
                 'status': 2000,
                 'payment_tx_id': payment_tx_id.id,
                 'request_values':payment_values,
-                'payment_tx_id': py_transc.id,
+                'payment_tx_id': py_transc,
             }
         except Exception as e:
             _logger.info("Exception occurred while initiating app payment - {0}-{1}".format(e, json_data))

@@ -82,6 +82,11 @@ class SaleOrder(models.Model):
             _logger.info("Exception occurred while getting distance {0}".format(e))
 
     def write(self, values):
+        if values.get('state',False):
+            if values.get('state') not in  ['sale','done']:
+                values.update({
+                    'apty_order_state':'draft'
+                })
         res = super(SaleOrder, self).write(values)
         if values.get('partner_shipping_id', False):
             for record in self:
