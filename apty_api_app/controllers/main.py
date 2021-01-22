@@ -201,7 +201,7 @@ class WebsiteSale(WebsiteSale):
                 'force_company': order.company_id.id,
                 'allowed_company_ids':[order.company_id.id]
             })
-            order.sudo().with_context(ctx).write(values)
+            order.with_user(user).with_context(ctx).write(values)
             return {'order_id':order.id}
         except Exception as e:
             return {
