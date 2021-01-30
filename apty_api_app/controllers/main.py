@@ -203,7 +203,15 @@ class WebsiteSale(WebsiteSale):
             })
             request.env.user = user
             order.sudo().with_context(ctx).write(values)
-            return {'order_id':order.id}
+            # delivery_charge = 0
+            # dl = order.order_line.filtered(lambda x: x.product_id.product_tmpl_id.id == request.env.ref(
+            #     'delivery.product_product_delivery_product_template').id)
+            # if len(dl.ids):
+            #     delivery_charge = dl.price_unit
+            return {
+                'order_id':order.id,
+                'delivery_charge':order.order_delivery_charge
+                }
         except Exception as e:
             return {
                 'status': 2000,

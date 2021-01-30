@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+       <record id="inherit_sale_view_order_form" model="ir.ui.view">
+           <field name="name">inherit.sale.view.order.form</field>
+           <field name="model">sale.order</field>
+           <field name="inherit_id" ref="sale.view_order_form"/>
+           <field name="arch" type="xml">
+               <xpath expr="//label[@for='commitment_date']" position="before">
+                   <field name="order_delivery_charge" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+               </xpath>
+           </field>
+       </record>
+
+    </data>
+</odoo>

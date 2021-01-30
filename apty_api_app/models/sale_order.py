@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+from math import floor
 from urllib.parse import urlencode
 from requests import request as py_request
 from odoo.tools.safe_eval import safe_eval
@@ -11,19 +12,24 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     payment_acquirer_id = fields.Many2one("payment.acquirer", string="Payment Acquirer")
+    order_delivery_charge = fields.Float(string="Delivery Charge")
 
     @api.model
     def _get_order_details(self):
+        delivery_product = self.env.ref('delivery.product_product_delivery_product_template').id
         order_lines = [{'product_id': ol.product_id.id,
                         'product_image': '/web/image/product.product/{0}/image_128'.format(ol.product_id.id),
                         'product_name': ol.product_id.name, 'qty': ol.product_uom_qty,
-                        'price': ol.price_unit, 'sub_total': ol.price_subtotal} for ol in self.order_line]
+                        'price': ol.price_unit, 'sub_total': ol.price_subtotal} for ol in
+                       self.order_line.filtered(lambda x: x.product_id.product_tmpl_id.id != delivery_product)]
+        dlv_line = self.order_line.filtered(lambda x: x.product_id.product_tmpl_id.id != delivery_product)
         return {
             'state': self.state,
             'order_lines': order_lines,
             'amount_untaxed': self.amount_untaxed,
             'taxes': self.amount_tax,
-            'total': self.amount_total
+            'total': self.amount_total,
+            'delivery_charge': dlv_line.id and dlv_line.price_unit or 0
         }
 
     def get_google_distance(self, partner_cords=[], company_cords=[]):
@@ -43,6 +49,7 @@ class SaleOrder(models.Model):
             response = py_request("GET",url=google_map_url, data={}, headers={})
             if response.status_code:
                 json_response = json.loads(response.text)
+                _logger.info("Google Distance API response:{0}".format(json_response))
                 response_distance = []
                 rows = json_response.get('rows')
                 for row in rows:
@@ -77,7 +84,7 @@ class SaleOrder(models.Model):
                 company_cords = [str(search_cords[0].get(sco)) for sco in ['partner_latitude','partner_longitude']]
                 geo_distance = self.get_google_distance(partner_cords=partner_cords,company_cords=company_cords)
                 geo_distance = geo_distance/1000
-                return self.calc_distance_amt(geo_distance=geo_distance)
+                return self.calc_distance_amt(geo_distance=geo_distance) * floor(geo_distance)
         except Exception as e:
             _logger.info("Exception occurred while getting distance {0}".format(e))
 
@@ -90,24 +97,28 @@ class SaleOrder(models.Model):
         res = super(SaleOrder, self).write(values)
         if values.get('partner_shipping_id', False):
             for record in self:
-                partner = self.partner_shipping_id.browse(values.get('partner_shipping_id'))
+                partner = record.partner_shipping_id.browse(values.get('partner_shipping_id'))
                 delivery_price = self.get_shipping_amount(partner_id=partner)
                 if not partner.id:
                     _logger.info("Could not find the partner for the order.")
-                delivery_product = self.env.ref('delivery.product_product_delivery_product_template')
-                delivery_line = self.order_line.filtered(lambda x:x.product_id.product_tmpl_id.id == delivery_product.id)
-                if not delivery_line.id:
-                    delivery_line.create({
-                        'product_id': delivery_product.product_variant_ids.id,
-                        'product_uom_qty': 1.0,
-                        'price_unit':delivery_price,
-                        'order_id':self.id,
-                    })
-                else:
-                    delivery_line.write({
-                        'price_unit': delivery_price
-                    })
-        return res
+                record.write({
+                    'order_delivery_charge':delivery_price,
+                    'amount_total': record.amount_total + delivery_price
+                })
+                # delivery_product = self.env.ref('delivery.product_product_delivery_product_template')
+                # delivery_line = self.order_line.filtered(lambda x:x.product_id.product_tmpl_id.id == delivery_product.id)
+        #         if not delivery_line.id:
+        #             delivery_line.create({
+        #                 'product_id': delivery_product.product_variant_ids.id,
+        #                 'product_uom_qty': 1.0,
+        #                 'price_unit':delivery_price,
+        #                 'order_id':self.id,
+        #             })
+        #         else:
+        #             delivery_line.write({
+        #                 'price_unit': delivery_price
+        #             })
+        # return res
 
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
