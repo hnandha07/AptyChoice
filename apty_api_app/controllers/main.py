@@ -209,9 +209,9 @@ class WebsiteSale(WebsiteSale):
             # if len(dl.ids):
             #     delivery_charge = dl.price_unit
             return {
-                'order_id':order.id,
-                'delivery_charge':order.order_delivery_charge
-                }
+                'order_id': order.id,
+                'delivery_charge': order.order_delivery_charge
+            }
         except Exception as e:
             return {
                 'status': 2000,

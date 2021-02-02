@@ -118,7 +118,7 @@ class SaleOrder(models.Model):
         #             delivery_line.write({
         #                 'price_unit': delivery_price
         #             })
-        # return res
+        return res
 
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
