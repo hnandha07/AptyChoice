@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo import fields, models, api
-
+from odoo import fields, models, tools
+from datetime import timedelta
+from ..controllers.main import _get_current_time
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -10,6 +11,9 @@ class ProductTemplate(models.Model):
     availability_time_start = fields.Float(string="Availability Time Start", )
     availability_time_end = fields.Float(string="Availability Time End", )
 
+    @tools.ormcache('self.id')
+    def _get_availability(self, message=False):
+        return self.availability_time_start < _get_current_time() < self.availability_time_end
 
 class ResCompany(models.Model):
     _inherit = 'res.company'

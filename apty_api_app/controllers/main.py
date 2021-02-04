@@ -4,6 +4,7 @@ from pytz import timezone
 from datetime import datetime, timedelta
 from pprint import pprint, pformat
 from odoo import http, _
+from odoo.osv import expression
 from odoo.http import request
 from odoo.addons.website.controllers.main import Website
 from odoo.exceptions import _logger
@@ -17,8 +18,17 @@ def _get_json_values(fields_to_check=[]):
         raise UserWarning("Not enough values {0}".format(json_data))
     return json_data
 
+def _get_current_time():
+    current_time = datetime.now(timezone('UTC')).astimezone(timezone('Asia/Kolkata'))
+    return timedelta(hours=current_time.hour,minutes=current_time.minute).seconds/3600
 
 class WebsiteSale(WebsiteSale):
+
+    def _get_search_domain(self, search, category, attrib_values, search_in_description=True):
+        res = super(WebsiteSale, self)._get_search_domain(search=search, category=category, attrib_values=attrib_values,
+                                                          search_in_description=search_in_description)
+        current_time = _get_current_time()
+        return res + [('is_available', '=', True)]
 
     @http.route('/app/zip/check', type='json', auth='none', cors="*")
     def check_zip_code(self):
@@ -502,7 +512,6 @@ class Shop(Website):
 
     @http.route('/app/shop/products', type='json', auth='public')
     def get_shop_products(self):
-        current_time = datetime.now(timezone('UTC')).astimezone(timezone('Asia/Kolkata'))
         json_data = request.jsonrequest
         fields = ['id', 'display_name', 'lst_price', 'availability_time_start', 'availability_time_end']
         offset = json_data.get('scroll_count', 0) * 10
@@ -519,10 +528,9 @@ class Shop(Website):
                                               offset=offset, limit=10, order=order)
         for product in product_obj:
             is_available = False
-            current_time_delta = timedelta(hours=current_time.hour,minutes=current_time.minute).seconds/3600
             start_time = product['availability_time_start']
             end_time = product['availability_time_end']
-            if start_time < current_time_delta < end_time :
+            if start_time < _get_current_time() < end_time :
                 is_available = True
             product.update({
                 'image_url': '/web/image/product.product/{0}/image_128'.format(product['id']),

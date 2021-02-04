@@ -8,6 +8,37 @@
         </xpath>
     </template>
 
+    <template inherit_id="website_sale.product" id="website_sale_product_inherit">
+        <xpath expr="//form[@action='/shop/cart/update']" position="attributes">
+            <attribute name="t-if">product._get_availability()</attribute>
+        </xpath>
+        <xpath expr="//form[@action='/shop/cart/update']" position="after">
+            <h6 t-if="not product._get_availability()" class="text-info text-bold text-uppercase mt24">
+                <t t-esc="'This product is available between {0} - {1}'.format(
+                str(datetime.timedelta(hours=product.availability_time_start))[0:-3],
+                str(datetime.timedelta(hours=product.availability_time_end))[0:-3])"/>
+            </h6>
+        </xpath>
+    </template>
+
+    <template inherit_id="website_sale.products_add_to_cart" id="products_add_to_cart_inherit">
+        <xpath expr="//t[@t-if='product_variant_id']" position="attributes">
+            <attribute name="t-if">product_variant_id and product._get_availability()</attribute>
+        </xpath>
+    </template>
+
+    <template id="website_sale_address_inherit" name="Website Sale Address Inherit"
+              inherit_id="website_sale.address">
+
+        <xpath expr="//select[@id='country_id']" position="replace">
+            <select id="country_id" name="country_id"
+                    t-attf-class="form-control #{error.get('country_id') and 'is-invalid' or ''}" readonly="1">
+                <option t-att-value="%(base.in)d" selected="">India</option>
+            </select>
+        </xpath>
+
+    </template>
+
     <template id="mobile_aboutus" name="Mobile About Us">
         <t t-call="website.aboutus">
             <t t-set="for_mobile" t-value="'d-none'"/>
