@@ -6,7 +6,9 @@ from urllib.parse import urlencode
 from requests import request as py_request
 from odoo.tools.safe_eval import safe_eval
 from odoo import fields, models, api, _
-from odoo.exceptions import _logger,ValidationError
+from odoo.exceptions import _logger
+from ..controllers.main import _get_current_time
+
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -105,19 +107,6 @@ class SaleOrder(models.Model):
                     'order_delivery_charge':delivery_price,
                     'amount_total': record.amount_total + delivery_price
                 })
-                # delivery_product = self.env.ref('delivery.product_product_delivery_product_template')
-                # delivery_line = self.order_line.filtered(lambda x:x.product_id.product_tmpl_id.id == delivery_product.id)
-        #         if not delivery_line.id:
-        #             delivery_line.create({
-        #                 'product_id': delivery_product.product_variant_ids.id,
-        #                 'product_uom_qty': 1.0,
-        #                 'price_unit':delivery_price,
-        #                 'order_id':self.id,
-        #             })
-        #         else:
-        #             delivery_line.write({
-        #                 'price_unit': delivery_price
-        #             })
         return res
 
     def action_confirm(self):
@@ -125,7 +114,19 @@ class SaleOrder(models.Model):
         self.write({
             'apty_order_state':'order',
         })
-        return  res
+        return res
+
+    @api.model
+    def get_unavailable_lines(self):
+        lines = []
+        try:
+            for ol in self.order_line:
+                if not (
+                        ol.product_id.availability_time_start < _get_current_time() < ol.product_id.availability_time_end):
+                    lines.append(ol.id)
+        except Exception as e:
+            _logger.info("Exception occurred while preparing unavailable lines {}".format(e))
+        return lines
 
     def prepare_order_lines(self, ol_details=[]):
         order_lines = []

@@ -22,7 +22,46 @@ def _get_current_time():
     current_time = datetime.now(timezone('UTC')).astimezone(timezone('Asia/Kolkata'))
     return timedelta(hours=current_time.hour,minutes=current_time.minute).seconds/3600
 
+
 class WebsiteSale(WebsiteSale):
+
+    def check_unavailable_lines(self):
+        status = False
+        order = request.website.sale_get_order()
+        if order.id and len(order.get_unavailable_lines()):
+            status = True
+        return status
+
+    def checkout_form_validate(self, mode, all_form_values, data):
+        res = super(WebsiteSale, self).checkout_form_validate(mode=mode, all_form_values=all_form_values, data=data)
+        if len(all_form_values['zip']):
+            pincode = request.env['regional.postal.code'].sudo().search([('name','=',all_form_values['zip'])])
+            if not len(pincode.ids):
+                res[0].update({
+                    'zip': 'error'
+                })
+                res[1].append(_("Incorrect Zip"))
+        else:
+            res[0].update({'zip':'missing'})
+        return res
+
+    @http.route(['/shop/address'], type='http', methods=['GET', 'POST'], auth="public", website=True, sitemap=False)
+    def address(self, **kw):
+        if self.check_unavailable_lines():
+            return request.redirect("/shop/cart")
+        return super(WebsiteSale, self).address(**kw)
+
+    @http.route(['/shop/payment'], type='http', auth="public", website=True, sitemap=False)
+    def payment(self, **post):
+        if self.check_unavailable_lines():
+            return request.redirect("/shop/cart")
+        return super(WebsiteSale, self).payment(**post)
+
+    @http.route(['/shop/checkout'], type='http', auth="public", website=True, sitemap=False)
+    def checkout(self, **post):
+        if self.check_unavailable_lines():
+            return request.redirect("/shop/cart")
+        return super(WebsiteSale, self).checkout(**post)
 
     def _get_search_domain(self, search, category, attrib_values, search_in_description=True):
         res = super(WebsiteSale, self)._get_search_domain(search=search, category=category, attrib_values=attrib_values,

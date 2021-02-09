@@ -29,14 +29,31 @@
 
     <template id="website_sale_address_inherit" name="Website Sale Address Inherit"
               inherit_id="website_sale.address">
-
         <xpath expr="//select[@id='country_id']" position="replace">
             <select id="country_id" name="country_id"
                     t-attf-class="form-control #{error.get('country_id') and 'is-invalid' or ''}" readonly="1">
-                <option t-att-value="%(base.in)d" selected="">India</option>
+                 <option t-att-value="%(base.in)d" selected="">India</option>
             </select>
         </xpath>
+    </template>
 
+    <template id="inherit_website_sale_cart" name="Inherit Website Sale Cart"
+              inherit_id="website_sale.cart">
+        <xpath expr="//t[@t-call='website_sale.cart_lines']" position="before">
+            <t t-set="unavailable_lines" t-value="website_sale_order.get_unavailable_lines()"/>
+        </xpath>
+    </template>
+
+    <template id="inherit_website_sale_cart_lines" inherit_id="website_sale.cart_lines"
+              name="Inherit Website Sale Cart Lines">
+        <xpath expr="//td[hasclass('td-product_name')]" position="inside">
+            <span class="text-danger"
+                  t-if="unavailable_lines and line.id in unavailable_lines or (line.id in website_sale_order.get_unavailable_lines())">
+            <t t-esc="'This product is available between {0} - {1}'.format(
+                str(datetime.timedelta(hours=line.product_id.availability_time_start))[0:-3],
+                str(datetime.timedelta(hours=line.product_id.availability_time_end))[0:-3])"/>
+            </span>
+        </xpath>
     </template>
 
     <template id="mobile_aboutus" name="Mobile About Us">
