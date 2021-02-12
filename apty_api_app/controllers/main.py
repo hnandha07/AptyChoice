@@ -40,7 +40,7 @@ class WebsiteSale(WebsiteSale):
                 res[0].update({
                     'zip': 'error'
                 })
-                res[1].append(_("Incorrect Zip"))
+                res[1].append(_("We not started service to this area code."))
         else:
             res[0].update({'zip':'missing'})
         return res
@@ -200,8 +200,8 @@ class WebsiteSale(WebsiteSale):
         try:
             json_data = _get_json_values(fields_to_check=['order_id'])
             order = request.env['sale.order'].browse(json_data.get('order_id')).sudo()
-            status = order.action_cancel()
-            return status
+            order.action_cancel()
+            return order.state == 'cancel' and True or False
         except Exception as e:
             return {
                 'status': 2000,

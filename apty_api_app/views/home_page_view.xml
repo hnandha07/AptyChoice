@@ -12,6 +12,7 @@
         <xpath expr="//form[@action='/shop/cart/update']" position="attributes">
             <attribute name="t-if">product._get_availability()</attribute>
         </xpath>
+        <xpath expr="//p[@t-else='']" position="replace"/>
         <xpath expr="//form[@action='/shop/cart/update']" position="after">
             <h6 t-if="not product._get_availability()" class="text-info text-bold text-uppercase mt24">
                 <t t-esc="'This product is available between {0} - {1}'.format(

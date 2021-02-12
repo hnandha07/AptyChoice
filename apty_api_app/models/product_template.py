@@ -11,9 +11,9 @@ class ProductTemplate(models.Model):
     availability_time_start = fields.Float(string="Availability Time Start", )
     availability_time_end = fields.Float(string="Availability Time End", )
 
-    @tools.ormcache('self.id')
     def _get_availability(self, message=False):
-        return self.availability_time_start < _get_current_time() < self.availability_time_end
+        status =  self.availability_time_start < _get_current_time() < self.availability_time_end
+        return status
 
 class ResCompany(models.Model):
     _inherit = 'res.company'

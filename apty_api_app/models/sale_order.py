@@ -24,14 +24,13 @@ class SaleOrder(models.Model):
                         'product_name': ol.product_id.name, 'qty': ol.product_uom_qty,
                         'price': ol.price_unit, 'sub_total': ol.price_subtotal} for ol in
                        self.order_line.filtered(lambda x: x.product_id.product_tmpl_id.id != delivery_product)]
-        dlv_line = self.order_line.filtered(lambda x: x.product_id.product_tmpl_id.id != delivery_product)
         return {
             'state': self.state,
             'order_lines': order_lines,
             'amount_untaxed': self.amount_untaxed,
             'taxes': self.amount_tax,
             'total': self.amount_total,
-            'delivery_charge': dlv_line.id and dlv_line.price_unit or 0
+            'delivery_charge': self.order_delivery_charge
         }
 
     def get_google_distance(self, partner_cords=[], company_cords=[]):
@@ -120,7 +119,8 @@ class SaleOrder(models.Model):
     def get_unavailable_lines(self):
         lines = []
         try:
-            for ol in self.order_line:
+            for ol in self.order_line.filtered(lambda x: x.product_id.id != self.env.ref(
+                    self.env.ref('delivery.product_product_delivery_product_template').id)):
                 if not (
                         ol.product_id.availability_time_start < _get_current_time() < ol.product_id.availability_time_end):
                     lines.append(ol.id)
