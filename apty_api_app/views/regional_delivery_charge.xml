@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="regional_delivery_charge_form" model="ir.ui.view">
+            <field name="name">regional.delivery.charge.form</field>
+            <field name="model">regional.delivery.charge</field>
+            <field name="arch" type="xml">
+                <form string="Regional Delivery Charge">
+                    <sheet>
+                        <group>
+                            <field name="regional_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="delivery_charge"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="regional_delivery_charge_tree" model="ir.ui.view">
+            <field name="name">regional.delivery.charge.tree</field>
+            <field name="model">regional.delivery.charge</field>
+            <field name="arch" type="xml">
+                <tree string="Regional Delivery Charge">
+                    <field name="delivery_charge"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="regional_delivery_charge_action" model="ir.actions.act_window">
+            <field name="name">Regional Delivery Charge</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">regional.delivery.charge</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="regional_delivery_charge_menu"
+                  name="Regional Delivery Charge" parent="npa_base.menu_npa_system"
+                  action="regional_delivery_charge_action" sequence="10"/>
+
+    </data>
+</odoo>

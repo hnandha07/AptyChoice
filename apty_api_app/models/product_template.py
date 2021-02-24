@@ -20,6 +20,8 @@ class ResCompany(models.Model):
 
     shop_time_open = fields.Float(string="Shop Open Time")
     shop_time_close = fields.Float(string="Shop Close Time")
+    order_delivery_charge = fields.Float(string="Default Regional Delivery Charge")
+
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'

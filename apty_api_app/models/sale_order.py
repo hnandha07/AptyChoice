@@ -78,16 +78,26 @@ class SaleOrder(models.Model):
     def get_shipping_amount(self, partner_id=False):
         try:
             if partner_id and partner_id.id:
-                partner_id.geo_localize()
-                search_cords = self.partner_id.search_read([('id', 'in', [partner_id.id, self.company_id.partner_id.id])],
-                                                           ['partner_latitude', 'partner_longitude'],order='id asc')
-                partner_cords = [str(search_cords[-1].get(sco)) for sco in ['partner_latitude','partner_longitude']]
-                company_cords = [str(search_cords[0].get(sco)) for sco in ['partner_latitude','partner_longitude']]
-                geo_distance = self.get_google_distance(partner_cords=partner_cords,company_cords=company_cords)
-                geo_distance = geo_distance/1000
-                return self.calc_distance_amt(geo_distance=geo_distance) * floor(geo_distance)
+                delivery_charge = self.env['regional.delivery.charge'].search(
+                    [('regional_ids.name', '=', partner_id.zip)], limit=1)
+
+                if not delivery_charge:
+                    delivery_charge = self.company_id.order_delivery_charge
+                else:
+                    delivery_charge = delivery_charge.delivery_charge
+
+                return delivery_charge
+                # partner_id.geo_localize()
+                # search_cords = self.partner_id.search_read([('id', 'in', [partner_id.id, self.company_id.partner_id.id])],
+                #                                            ['partner_latitude', 'partner_longitude'],order='id asc')
+                # partner_cords = [str(search_cords[-1].get(sco)) for sco in ['partner_latitude','partner_longitude']]
+                # company_cords = [str(search_cords[0].get(sco)) for sco in ['partner_latitude','partner_longitude']]
+                # geo_distance = self.get_google_distance(partner_cords=partner_cords,company_cords=company_cords)
+                # geo_distance = geo_distance/1000
+                # return self.calc_distance_amt(geo_distance=geo_distance) * floor(geo_distance)
         except Exception as e:
             _logger.info("Exception occurred while getting distance {0}".format(e))
+            return 0
 
     def write(self, values):
         if values.get('state',False):
