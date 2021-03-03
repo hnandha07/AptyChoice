@@ -109,13 +109,24 @@ class SaleOrder(models.Model):
         if values.get('partner_shipping_id', False):
             for record in self:
                 partner = record.partner_shipping_id.browse(values.get('partner_shipping_id'))
-                delivery_price = self.get_shipping_amount(partner_id=partner)
                 if not partner.id:
                     _logger.info("Could not find the partner for the order.")
-                record.write({
-                    'order_delivery_charge':delivery_price,
-                    'amount_total': record.amount_total + delivery_price
-                })
+
+                delivery_price = self.get_shipping_amount(partner_id=partner)
+                delivery_product = self.env.ref('delivery.product_product_delivery_product_template')
+                delivery_line = self.order_line.filtered(
+                    lambda x: x.product_id.product_tmpl_id.id == delivery_product.id)
+                if not delivery_line.id:
+                    delivery_line.create({
+                        'product_id': delivery_product.product_variant_ids.id,
+                        'product_uom_qty': 1.0,
+                        'price_unit': delivery_price,
+                        'order_id': record.id,
+                    })
+                else:
+                    delivery_line.write({
+                        'price_unit': delivery_price
+                    })
         return res
 
     def action_confirm(self):

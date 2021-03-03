@@ -18,6 +18,14 @@ class RegionalDeliveryCharge(models.Model):
     regional_ids = fields.Many2many("regional.postal.code")
     delivery_charge = fields.Float(string="Delivery Charge")
 
+    @api.onchange('regional_ids')
+    def onchange_regional_ids(self):
+        return {
+            'domain': {
+                'regional_ids': [('id', 'not in', self.search([]).mapped('regional_ids.id'))]
+            }
+        }
+
     def write(self, vals):
         zip_code_ids = vals.get('regional_ids')
         if zip_code_ids:

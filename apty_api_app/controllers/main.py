@@ -51,6 +51,7 @@ class WebsiteSale(WebsiteSale):
             return request.redirect("/shop/cart")
         return super(WebsiteSale, self).address(**kw)
 
+
     @http.route(['/shop/payment'], type='http', auth="public", website=True, sitemap=False)
     def payment(self, **post):
         if self.check_unavailable_lines():
@@ -68,6 +69,37 @@ class WebsiteSale(WebsiteSale):
                                                           search_in_description=search_in_description)
         current_time = _get_current_time()
         return res + [('is_available', '=', True)]
+
+    @http.route(['/apply/coupon'], type='json', auth="none")
+    def apply_coupon(self):
+        json_data = _get_json_values(fields_to_check=['order_id', 'promo'])
+        order = request.env['sale.order'].sudo().browse(int(json_data.get('order_id')))
+        promo = json_data.get('promo', '')
+        status = {
+            'status': False,
+            'message': ''
+        }
+        if not len(promo):
+            status['message'] = 'Invalid Promo Code'
+            return status
+
+        if order.id:
+            if order.state == 'draft':
+                coupon_status = request.env['sale.coupon.apply.code'].sudo().apply_coupon(order, promo)
+                if coupon_status.get('not_found', False):
+                    status['message'] = 'Invalid Promo Code'
+                elif coupon_status.get('error', False):
+                    status['message'] = coupon_status.get('error')
+                else:
+                    status: {
+                        'status': True,
+                        'message': "Coupons Applied Successfully."
+                    }
+            else:
+                status['message'] = 'Order is not in draft state'
+        else:
+            status['message'] = 'Order not found'
+        return status
 
     @http.route('/app/zip/check', type='json', auth='none', cors="*")
     def check_zip_code(self):
@@ -212,6 +244,7 @@ class WebsiteSale(WebsiteSale):
     def app_add_order(self):
         try:
             json_data = _get_json_values(fields_to_check=['user_id','mode'])
+            _logger.info("Values for App Order: {0}".format(json_data))
             values ={}
             mode = json_data.get('mode')
             ctx = request.env.context.copy()
@@ -552,7 +585,8 @@ class Shop(Website):
     @http.route('/app/shop/products', type='json', auth='public')
     def get_shop_products(self):
         json_data = request.jsonrequest
-        fields = ['id', 'display_name', 'lst_price', 'availability_time_start', 'availability_time_end']
+        fields = ['id', 'display_name', 'lst_price', 'availability_time_start', 'availability_time_end',
+                  'description_sale']
         offset = json_data.get('scroll_count', 0) * 10
         product_obj = request.env['product.product'].sudo()
         order = 'create_date'
