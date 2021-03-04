@@ -19,18 +19,21 @@ class SaleOrder(models.Model):
     @api.model
     def _get_order_details(self):
         delivery_product = self.env.ref('delivery.product_product_delivery_product_template').id
+        item_lines = self.order_line.filtered(lambda x: (x.product_id.product_tmpl_id.id != delivery_product) or (x.price_subtotal < 0))
         order_lines = [{'product_id': ol.product_id.id,
                         'product_image': '/web/image/product.product/{0}/image_128'.format(ol.product_id.id),
                         'product_name': ol.product_id.name, 'qty': ol.product_uom_qty,
-                        'price': ol.price_unit, 'sub_total': ol.price_subtotal} for ol in
-                       self.order_line.filtered(lambda x: x.product_id.product_tmpl_id.id != delivery_product)]
+                        'price': ol.price_unit, 'sub_total': ol.price_subtotal} for ol in item_lines]
+
         return {
             'state': self.state,
             'order_lines': order_lines,
-            'amount_untaxed': self.amount_untaxed,
+            'amount_untaxed': sum(item_lines.mapped('price_subtotal')),
             'taxes': self.amount_tax,
             'total': self.amount_total,
-            'delivery_charge': self.order_delivery_charge
+            'discount': sum(self.order_line.filtered(lambda x: x.price_subtotal < 0).mapped('price_subtotal')),
+            'delivery_charge': self.order_line.filtered(
+                lambda x: x.product_id.product_tmpl_id.id == delivery_product).price_subtotal
         }
 
     def get_google_distance(self, partner_cords=[], company_cords=[]):
