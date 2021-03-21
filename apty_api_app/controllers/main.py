@@ -502,8 +502,13 @@ class Shop(Website):
                             'id': offer.id,
                             'name': offer.product_tmpl_id.name,
                             'price': offer.fixed_price,
-                            'image':'/web/image/product.template/{0}/image_128'.format(offer.product_tmpl_id.id),
+                            'image': '/web/image/product.template/{0}/image_128'.format(offer.product_tmpl_id.id),
+                            'availability_time_start': offer.product_tmpl_id.availability_time_start,
+                            'availability_time_end': offer.product_tmpl_id.availability_time_end,
                             'price_str': offer.price,
+                            'description_sale':offer.product_tmpl_id.description_sale,
+                            'is_available': offer.product_tmpl_id.availability_time_start <
+                                            _get_current_time() < offer.product_tmpl_id.availability_time_end,
                         } for offer in deal.offers_products
                     ],
                 })
@@ -521,7 +526,7 @@ class Shop(Website):
         :param kwargs:
         :return:
         """
-        return request.render('apty_api_app.mobile_aboutus',{})
+        return request.render('website.aboutus',{'for_mobile':'d-none','display_remove':False})
 
     @http.route('/app/home', type='json', auth='public')
     def get_home_page(self, **kwargs):

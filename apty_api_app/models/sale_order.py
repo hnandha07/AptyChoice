@@ -19,7 +19,11 @@ class SaleOrder(models.Model):
     @api.model
     def _get_order_details(self):
         delivery_product = self.env.ref('delivery.product_product_delivery_product_template').id
-        item_lines = self.order_line.filtered(lambda x: (x.product_id.product_tmpl_id.id != delivery_product) or (x.price_subtotal < 0))
+        item_lines = self.order_line.filtered(
+            lambda x: (x.product_id.product_tmpl_id.id != delivery_product) or (x.price_subtotal < 0))
+        zero_lines = self.order_line.filtered(
+            lambda x: (x.product_id.product_tmpl_id.id != delivery_product) or (x.price_subtotal == 0))
+        zero_lines.unlink()
         order_lines = [{'product_id': ol.product_id.id,
                         'product_image': '/web/image/product.product/{0}/image_128'.format(ol.product_id.id),
                         'product_name': ol.product_id.name, 'qty': ol.product_uom_qty,
