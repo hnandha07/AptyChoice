@@ -22,7 +22,7 @@ class SaleOrder(models.Model):
         item_lines = self.order_line.filtered(
             lambda x: (x.product_id.product_tmpl_id.id != delivery_product) or (x.price_subtotal < 0))
         zero_lines = self.order_line.filtered(
-            lambda x: (x.product_id.product_tmpl_id.id != delivery_product) or (x.price_subtotal == 0))
+            lambda x: (x.product_id.product_tmpl_id.id != delivery_product) and (x.price_subtotal == 0))
         zero_lines.unlink()
         order_lines = [{'product_id': ol.product_id.id,
                         'product_image': '/web/image/product.product/{0}/image_128'.format(ol.product_id.id),

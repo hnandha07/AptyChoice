@@ -86,12 +86,13 @@ class WebsiteSale(WebsiteSale):
         if order.id:
             if order.state == 'draft':
                 coupon_status = request.env['sale.coupon.apply.code'].sudo().apply_coupon(order, promo)
-                if coupon_status.get('not_found', False):
-                    status['message'] = 'Invalid Promo Code'
-                elif coupon_status.get('error', False):
-                    status['message'] = coupon_status.get('error')
+                if len(coupon_status):
+                    if coupon_status.get('not_found', False):
+                        status['message'] = 'Invalid Promo Code'
+                    elif coupon_status.get('error', False):
+                        status['message'] = coupon_status.get('error')
                 else:
-                    status: {
+                    status = {
                         'status': True,
                         'message': "Coupons Applied Successfully."
                     }
@@ -500,6 +501,7 @@ class Shop(Website):
                     'offer_products': [
                         {
                             'id': offer.id,
+                            'product_id':offer.product_tmpl_id.id,
                             'name': offer.product_tmpl_id.name,
                             'price': offer.fixed_price,
                             'image': '/web/image/product.template/{0}/image_128'.format(offer.product_tmpl_id.id),
