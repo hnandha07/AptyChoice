@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Supplier Details tree view-->
+        <record id="view_supplierf_details_tree" model="ir.ui.view">
+            <field name="name">supplier details</field>
+            <field name="model">npa.supplier_details</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <tree >
+                    <field name="name"/>
+                    <field name="route_id" />
+                    <field name="display_address"/>
+                    <field name="phone_num1"/>
+                    <field name="mobile_num1"/>
+                    <field name="email"/>                                       
+                </tree>
+            </field>
+        </record>
+
+        <!--  Staff details form view -->
+        <record id="view_setup_supplier_details_form" model="ir.ui.view">
+            <field name="name">Supplier form view</field>
+            <field name="model">npa.supplier_details</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <field name="picture" widget='image' options='{"size": [150, 140]}' nolabel="1"/>                                
+                            </div>
+                            <div class="col-sm-5">
+                                <group>
+                                    <field name="name" required ="True"/>                                                                        
+                                </group>
+                            </div>
+                             <div class="col-sm-5">
+                                <group>
+                                    <field name="code" required ="True"/>                                                                     
+                                </group>
+                            </div>
+                        </div>    
+                        <group string="Contact details">
+                            <group>                            
+                                <label for="street" string="Address"/>
+                                <div class="o_address_format">
+                                    <field name="address1" placeholder="Street..." class="o_address_street"/>
+                                    <field name="address2" placeholder="Street 2..." class="o_address_street"/>
+                                    <field name="city" placeholder="City" class="o_address_city"/>
+                                    <field name="zip_code" placeholder="ZIP" class="o_address_zip"/>
+                                    <field name="state_id" class="o_address_state" placeholder="State" options="{'no_open':True,'no_create':True}"/>                                    
+                                    <field name="country_id" placeholder="Country" class="o_address_country" options="{'no_open':True,'no_create':True}"/>
+                                </div>
+                                <newline/>                                                            
+                            </group>
+                            <group>
+                                <field name="email"/>
+                                <field name="whatsapp_num"/>
+                                <field name="mobile_num1"/>
+                                <field name="mobile_num2"/>                                
+                            </group>
+                        </group>
+                        <notebook>
+                            <page name="contact" string="Contact Details">
+                                <group>                                    
+                                    <group>
+                                        <field name="contact_person1"/>
+                                        <field name="phone_num2"/>                                                                                    
+                                    </group>
+                                    <group>
+                                        <field name="phone_num1"/>
+                                        <field name="login_domain"/>                                            
+                                    </group>
+                                </group>
+                            </page>
+                            <page name="document" string="Case Document">
+                                  <field name="document_ids" widget="one2many_list">
+                                      <tree string="Case Document" create='false' editable='false' delete='false' limit="5">
+                                          <field name="name" required='1'/>
+                                          <field name="file_name" invisible='1'/>                                          
+                                          <field name="doc_type_id" invisible='True' options="{'no_open':True,'no_create':True}"/>                                          
+                                          <field name="doc_date"/>
+                                          <field name="bill_amt" />
+                                          <field name="payment_amt" />
+                                          <field name='state'/>
+                                      </tree>
+                                  </field>
+                             </page>
+                        </notebook>           
+                        <group>
+                              <table style='width:100%; border-top: 1px solid #ccccff;'>
+                                <tr>
+                                  <th style='width:7%;'><label for="create_date" string='Created:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="create_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="create_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td style='width:20%;'><field name="create_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                  <th style='width:7%;'><label for="write_date" string='Last updated:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="write_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="write_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td><field name="write_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                </tr>
+                             </table>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Staff details search view -->
+        <record id="view_supplier_details_search" model="ir.ui.view">
+            <field name="name">Search Supplierr Details</field>
+            <field name="model">npa.supplier_details</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Apty Expense Details-->
+        <record id="view_apty_expense_tree" model="ir.ui.view">
+            <field name="name">Expense Details</field>
+            <field name="model">npa.expense_details_hdr</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" />                   
+                    <field name="from_date"/> 
+                    <field name="to_date" />                   
+                    <field name="age"/>                    
+                </tree>
+            </field>
+        </record>        
+        
+        <record id="view_apty_expense_form" model="ir.ui.view">
+            <field name="name">Apty expenses form view</field>
+            <field name="model">npa.expense_details_hdr</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="get_service_request_wizard" string="Confirm" type="object" class="btn btn-success" attrs="{'invisible':[('state','!=','New')]}"/>
+                        <button name="create_service_payment" type="object" class="oe_highlight" string="Register Payment" attrs="{'invisible':[('state','=','New')]}"/>                        
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>                            
+                            <group>                            
+                                <field name="service_name"/>                   
+                                <field name="service_desc"/>
+                                <field name="state"/>                                                        
+                            </group>
+                            <group>
+                                <field name="from_date"/>
+                                <field name="to_date"/>
+                                <field name="age"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page name="expense_summary" string="Expense Sumary">
+                                <field name="expense_ids" style="border: 1px solid #894bdf">
+                                    <tree string="Expense Sumary" editable="True">
+                                        <field name="person_name"/>                                        
+                                        <field name="unit_type_id" options="{'no_open':True,'no_create':True}"/>                                                                                 
+                                        <field name="service_cost"/>                                                                               
+                                        <field name="service_qty"/>
+                                        <field name="service_gst"/>                                         
+                                        <field name="service_amt" widget="monetary"/>                                                                                                                 
+                                    </tree>
+                                </field>
+                                <group class="oe_subtotal_footer">
+                                    <field name="total_service_amt"/>                                        
+                                    <field name="payment_amt"/>
+                                    <field name="amount_residual" class="oe_subtotal_footer_separator"/>
+                                </group>                            
+                            </page>
+                            <page name="payment_list" string="Payment List">
+                                <field name="payment_ids" style="border: 1px solid #894bdf">
+                                    <tree string="Payment List" create="false" edit="false">
+                                        <field name="service_id" options="{'no_open':True,'no_create':True}"/> 
+                                        <field name="payment_date" options="{'no_open':True,'no_create':True}"/>                                
+                                        <field name="payment_method"/>                                                                               
+                                        <field name="bank_name"/>
+                                        <field name="tran_refno"/>                                        
+                                        <field name="state"/>                                         
+                                        <field name="payment_amt" sum="Total"/>                                                                                                                 
+                                    </tree>
+                                </field>
+                            </page>                            
+                         </notebook>
+                        <group>
+                              <table style='width:100%;'>
+                                <tr>
+                                  <th style='width:7%;'><label for="create_date" string='Created:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="create_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="create_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td style='width:20%;'><field name="create_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                  <th style='width:10%;'><label for="write_date" string='Last updated:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="write_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="write_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td><field name="write_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                </tr>
+                             </table>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Supplier Details tree view-->
+        <record id="view_stock_details_tree" model="ir.ui.view">
+            <field name="name">Stock Details</field>
+            <field name="model">npa.stock_details</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <tree >
+                    <field name="name"/>
+                    <field name="category_id" />
+                    <field name="purchase_date"/>
+                    <field name="last_price"/>
+                    <field name="purchase_qty"/>
+                    <field name="stock_qty"/>                                       
+                </tree>
+            </field>
+        </record>
+
+        <!--  Staff details form view -->
+        <record id="view_stock_details_form" model="ir.ui.view">
+            <field name="name">Stock form view</field>
+            <field name="model">npa.stock_details</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <field name="picture" widget='image' options='{"size": [150, 140]}' nolabel="1"/>                                
+                            </div>
+                            <div class="col-sm-5">
+                                <group>
+                                    <field name="name" required ="True"/>
+                                    <field name="stock_desc"/>                                                                        
+                                </group>
+                            </div>
+                             <div class="col-sm-5">
+                                <group>
+                                    <field name="stock_code" readonly ="True"/>                                                                     
+                                </group>
+                            </div>
+                        </div>
+                        <notebook>
+                            <page name="general" string="General Information">
+                                <group>                                    
+                                    <group>
+                                        <field name="category_id" options="{'no_open':True,'no_create':True}"/>
+                                        <field name="last_price" readonly="1"/>
+                                        <field name="purchase_date" readonly="1"/>                                                                                  
+                                    </group>
+                                    <group>
+                                        <field name="unit_type_id" options="{'no_open':True,'no_create':True}"/>                                        
+                                        <field name="purchase_qty" readonly="1"/>
+                                        <field name="stock_gst" />                                            
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>           
+                        <group>
+                              <table style='width:100%; border-top: 1px solid #ccccff;'>
+                                <tr>
+                                  <th style='width:7%;'><label for="create_date" string='Created:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="create_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="create_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td style='width:20%;'><field name="create_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                  <th style='width:7%;'><label for="write_date" string='Last updated:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="write_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="write_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td><field name="write_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                </tr>
+                             </table>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Staff details search view -->
+        <record id="view_stock_details_search" model="ir.ui.view">
+            <field name="name">Search Stock Details</field>
+            <field name="model">npa.stock_details</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Apty Purchase Request-->
+        <record id="view_apty_po_request_tree" model="ir.ui.view">
+            <field name="name">Purchase Order</field>
+            <field name="model">npa.stock_request</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" />                   
+                    <field name="Order_date"/>
+                    <field name="supplier_id"/>  
+                    <field name="purchase_desc" />                   
+                    <field name="state"/>                    
+                </tree>
+            </field>
+        </record>        
+        
+        <record id="view_apty_po_request_form" model="ir.ui.view">
+            <field name="name">Purchase Order form view</field>
+            <field name="model">npa.stock_request</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="get_purchase_stock_post_wizard" string="Confirm" type="object" class="btn btn-success" attrs="{'invisible':[('state','!=','New')]}"/>
+                        <button name="create_shop_payment" type="object" class="oe_highlight" string="Register Payment" attrs="{'invisible':[('state','=','New')]}"/>
+                        <!-- Preview (only customer invoices) -->
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>                            
+                                <field name="name" attrs="{'readonly':[('state','!=','New')]}" readonly="1"/>                   
+                                <field name="supplier_id" options="{'no_open':True,'no_create':True}" attrs="{'readonly':[('state','!=','New')]}"/>
+                                <field name="purchase_desc" attrs="{'readonly':[('state','!=','New')]}" />                                                        
+                            </group>
+                            <group>
+                                <field name="Order_date" attrs="{'readonly':[('state','!=','New')]}"/>
+                                <field name="received_date" attrs="{'readonly':[('state','!=','New')]}"/>
+                                <!-- <field name="stock_gst" attrs="{'readonly':[('state','!=','New')]}"/> -->
+                                <field name="state" readonly="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page name="order_list" string="Purchase List">
+                                <field name="purchase_ids" style="border: 1px solid #894bdf" attrs="{'readonly':[('state','!=','New')]}">
+                                    <tree string="Purchase List" editable="True" >
+                                        <field name="stock_id" options="{'no_open':True,'no_create':True}" /> 
+                                        <field name="unit_type_id" options="{'no_open':True,'no_create':True}" readonly="1" force_save="1"/>                                
+                                        <field name="stock_price"/>                                                                               
+                                        <field name="stock_qty"/>
+                                        <field name="sgst" string="SGST"/>
+                                        <field name="cgst" string="CGST"/>                
+                                        <field name="stock_amt" widget="monetary"/>                                                                                                                 
+                                    </tree>
+                                </field> 
+                                <group class="oe_subtotal_footer">                                     
+                                    <field name="total_stock_amt"/>
+                                    <!-- <field name="total_gst"/> -->
+                                    <field name="gross_amt"/>                                          
+                                    <field name="payment_amt"/>
+                                    <field name="amount_residual" class="oe_subtotal_footer_separator"/>
+                                </group>                           
+                            </page>
+                            <page name="payment_list" string="Payment List">
+                                <field name="payment_ids" style="border: 1px solid #894bdf" attrs="{'readonly':[('state','!=','New')]}">
+                                    <tree string="Payment List" create="false" edit="false">
+                                        <field name="stock_reqst_id" options="{'no_open':True,'no_create':True}"/> 
+                                        <field name="payment_date" options="{'no_open':True,'no_create':True}"/>                                
+                                        <field name="payment_method"/>                                                                               
+                                        <field name="bank_name"/>
+                                        <field name="tran_refno"/>                                        
+                                        <field name="state"/>                                         
+                                        <field name="payment_amt" sum="Total"/>                                                                                                                 
+                                    </tree>
+                                </field>
+                            </page>                           
+                         </notebook>
+                        <group>
+                              <table style='width:100%;'>
+                                <tr>
+                                  <th style='width:7%;'><label for="create_date" string='Created:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="create_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="create_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td style='width:20%;'><field name="create_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                  <th style='width:10%;'><label for="write_date" string='Last updated:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="write_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="write_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td><field name="write_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                </tr>
+                             </table>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+         <!--Strat Supplier payment details Views-->
+        <!-- Supplier payment tree view-->
+        <record id="view_shop_payment_tree" model="ir.ui.view">
+            <field name="name">Supplier payment details</field>
+            <field name="model">npa.shop_payment_amt</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <tree>                                        
+                    <field name="payment_method"/>                                       
+                    <field name="bank_name"/> 
+                    <field name="bank_slipno"/>
+                    <field name="tran_refno"/> 
+                    <field name="payment_amt"/>                     
+                </tree>
+            </field>
+        </record>
+
+        <!--  Supplier payment details form view -->
+        <record id="view_shop_payment_form" model="ir.ui.view">
+            <field name="name">View supplier payment form </field>
+            <field name="model">npa.shop_payment_amt</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <form create="false" edit="false">
+                    <sheet>
+                        <group string="Transaction Header">
+                            <group>
+                                <field name="stock_reqst_id" options="{'no_open':True,'no_create':True}" readonly="True"/>
+                                <field name="service_id" options="{'no_open':True,'no_create':True}" readonly="True"/>
+                            </group>
+                            <group>
+                                <field name="payment_date" required="True"/>                                
+                            </group>
+                        </group>
+                        <group string="Transaction Details">
+                            <group>
+                                <field name="tran_refno" />
+                                <field name="payment_amt" required="True"/>                                                                                               
+                            </group>
+                            <group>  
+                                <field name="payment_method" required="True"/>                              
+                                <field name="bank_name"/>                                
+                                <field name="bank_slipno"/>                              
+                            </group>
+                        </group>
+                        <group>
+                            <field name="remarks"/> 
+                        </group>
+                        <group>
+                              <table style='width:100%;'>
+                                <tr>
+                                  <th style='width:7%;'><label for="create_date" string='Created:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="create_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="create_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td style='width:20%;'><field name="create_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                  <th style='width:10%;'><label for="write_date" string='Last updated:' style="font-weight:bold;"/></th>
+                                  <td style='width:15%;'><field name="write_date" readonly="1"/></td>
+                                  <th style='width:3%;'><label for="write_uid" string='By:' style="font-weight:bold;"/></th>
+                                  <td><field name="write_uid" readonly="1" options="{'no_open':True,'no_create':True}"/></td>
+                                </tr>
+                             </table>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+         <!-- Customer payment search view -->
+        <record id="view_shop_payment_search" model="ir.ui.view">
+            <field name="name">Search Payment Details</field>
+            <field name="model">npa.shop_payment_amt</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <search>
+                    <field name="supplier_id"/>
+                    <field name="service_id"/>
+                </search>
+            </field>
+        </record>
+        <!--End customer payment details Views-->
+
+        <record id="view_stock_moves_tree" model="ir.ui.view">
+            <field name="name">Stock Moves</field>
+            <field name="model">npa.stock_moves</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <tree delete="false" edit='false'>
+                    <field name="date_moved" required ="True" />
+                    <field name="stock_id" required ="True" options="{'no_open':True,'no_create':True}"/>
+                    <field name="reference" />                    
+                    <field name="move_from" required ="True"/>
+                    <field name="move_to" required ="True"/>
+                    <field name="unit_type_id" required ="True"/>
+                    <field name="stock_qty" sum="Total"/>                    
+                </tree>
+            </field>
+        </record> 
+
+         <!--  Supplier payment details form view -->
+        <record id="view_stock_move_form" model="ir.ui.view">
+            <field name="name">View stock movement form </field>
+            <field name="model">npa.stock_moves</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <form edit="false" delete='false'>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="date_moved" required ="True"/>
+                                <field name="stock_id" required ="True" options="{'no_open':True,'no_create':True}" />
+                            </group>
+                            <group>
+                                <field name="reference" />                                
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="move_from" required="True"/>
+                                <field name="move_to" /> 
+                                <field name="stock_price" readonly="1" force_save="1"/>                                                                                               
+                            </group>
+                            <group>  
+                                <field name="unit_type_id" options="{'no_open':True,'no_create':True}" readonly="1" force_save="1"/>                              
+                                <field name="stock_qty" required="True"/>
+                                <field name="stock_amount" readonly="1" force_save="1"/>                
+                            </group>
+                        </group>                        
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+         <!-- Customer payment search view -->
+        <record id="view_stock_move_search" model="ir.ui.view">
+            <field name="name">Search Stock Movement</field>
+            <field name="model">npa.stock_moves</field>
+            <field name="priority" eval="0" />
+            <field name="arch" type="xml">
+                <search>
+                    <field name="date_moved"/>
+                    <field name="stock_id"/>
+                </search>
+            </field>
+        </record>
+
+    </data>
+</odoo>

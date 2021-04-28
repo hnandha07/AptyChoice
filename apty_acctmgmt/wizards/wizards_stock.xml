@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Post stock transfer request view -->
+        <record id="post_purchase_stock_req_wizard" model="ir.ui.view">
+            <field name="name">post.stock.transfer.req.wizard</field>
+            <field name="model">npa.common_wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <p style="color:#FF6347"><b>Click OK to confirm this stock transfer request.</b></p>
+                    <footer>
+                        <button name="post_stock_transfer_req" type="object" string="OK" class="btn btn-success"/>
+                        <button special="cancel" string="Cancel" class="btn btn-danger" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Post service transfer request view -->
+        <record id="post_service_request_wizard" model="ir.ui.view">
+            <field name="name">post.service.request.wizard</field>
+            <field name="model">npa.common_wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <p style="color:#FF6347"><b>Click OK to confirm this service request.</b></p>
+                    <footer>
+                        <button name="post_service_req" type="object" string="OK" class="btn btn-success"/>
+                        <button special="cancel" string="Cancel" class="btn btn-danger" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--Main Sub Nenu -->
+        <menuitem id="menu_aapty_suppliers" parent="npa_base.menu_aapty_customers" name="Suppliers" sequence="4"/> 
+
+        <!-- Setup Sub Menu Supplier Details -->
+        <menuitem id="menu_npa_supplier_details" parent="menu_aapty_suppliers" sequence="4"
+            name="Supplier Details" action="action_apty_supplier_details"/>
+
+        <!-- Setup Sub Menu Expense Details -->
+        <menuitem id="menu_npa_expense_details" parent="menu_aapty_suppliers" sequence="6"
+            name="Service Expense" action="action_apty_expense_details"/>
+
+        <!-- Setup Sub Menu Expense Details -->
+        <menuitem id="menu_npa_stock_details" parent="menu_aapty_suppliers" sequence="8"
+            name="Stock Details" action="action_apty_stock_details"/>
+
+        <!-- Setup Sub Menu Purchase Order -->
+        <menuitem id="menu_npa_po_request" parent="menu_aapty_suppliers" sequence="8"
+            name="Purchase Order" action="action_apty_po_request"/>
+
+        <!-- Setup Sub Menu Stock Move -->
+        <menuitem id="menu_npa_stock_move" parent="menu_aapty_suppliers" sequence="10"
+            name="Move Stock" action="action_apty_stock_move"/>
+    </data>
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE xml>
+<odoo>
+    <data noupdate="1">
+            <record id="seq_purchase_order_code" model="ir.sequence">
+                <field name="name">Purchase Order</field>
+                <field name="code">npa.stock_request</field>
+                <field name="prefix">PO%(year)s%(month)s%(day)s/</field>
+                <field name="padding">5</field>
+            </record>
+
+            <record id="seq_service_order_code" model="ir.sequence">
+                <field name="name">Service Order</field>
+                <field name="code">npa.expense_details_hdr</field>
+                <field name="prefix">SO%(year)s%(month)s%(day)s/</field>
+                <field name="padding">5</field>
+            </record>
+    </data>
+</odoo>

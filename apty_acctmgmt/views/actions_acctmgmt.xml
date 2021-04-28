@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Actions Supplier Details-->
+        <record id="action_apty_supplier_details" model="ir.actions.act_window">
+            <field name="name">Supplier details</field>
+            <field name="res_model">npa.supplier_details</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to create a new supplier details.
+            </p>
+            </field>
+        </record>
+
+        <!-- Actions Service Expense Details-->
+        <record id="action_apty_expense_details" model="ir.actions.act_window">
+            <field name="name">Service Expense Details</field>
+            <field name="res_model">npa.expense_details_hdr</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to create a new expense details.
+            </p>
+            </field>
+        </record>
+
+        <!-- Actions Stock Details-->
+        <record id="action_apty_stock_details" model="ir.actions.act_window">
+            <field name="name">Stock Details</field>
+            <field name="res_model">npa.stock_details</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to create a new stock details.
+            </p>
+            </field>
+        </record>
+
+        <!-- Actions Purchase Request Details-->
+        <record id="action_apty_po_request" model="ir.actions.act_window">
+            <field name="name">Purchase Order</field>
+            <field name="res_model">npa.stock_request</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to create a new purchase order.
+            </p>
+            </field>
+        </record>
+
+        <!-- Actions Purchase Request Details-->
+        <record id="action_apty_stock_move" model="ir.actions.act_window">
+            <field name="name">Move Stock</field>
+            <field name="res_model">npa.stock_moves</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+              Click to create a new stock move.
+            </p>
+            </field>
+        </record>
+    </data>
+</odoo>
