@@ -26,21 +26,20 @@ var OrderProcessDashboard = AbstractAction.extend({
         var args = arguments;
         var sup = this._super;
         var apty_list = this.$el.find('.list-order');
-        console.log($(apty_list));
+        // var src = "/apty_order_dashboard/static/src/sounds/notification.mp3";
+        // $('body').append('<audio id="notification" src="'+src+'" autoplay="true"></audio>');
         rpc.query({
                     model: 'sale.order',
-                    method: 'search_read',
-                    args: [[['state', '=', 'sale']], ['name', 'id', 'partner_id', 'apty_order_state']],
+                    method: 'get_order_data',
+                    args: [[['state', '=', 'sale'],['apty_order_state', '=', 'order']], ['name', 'id', 'partner_id', 'apty_order_state']],
                 }).then(function (data) {
                     if (data.length) {
                         $(apty_list).find('tr').remove();
                         _.each(data, function(order) {
-                            var tr_string = "<tr class='order-row' data-order-id="+ order['id'] +"><td>"+order['name']+"</td><td>"+order['partner_id'][1]+"</td></tr>";
+                            var tr_string = "<tr class='order-row' data-order-id="+ order['id'] +"><td>"+order['name']+"</td><td>"+order['partner_id'][1]+"</td><td>Portal</td></tr>";
                             $(apty_list).append(tr_string);
                         });
-                    } else {
-                        resolve(null);
-                    }
+                    } 
                 });
     return this;
     },
@@ -53,7 +52,6 @@ var OrderProcessDashboard = AbstractAction.extend({
             method: 'get_order_details',
             args: [[[parseInt(order_id)]]],
         }).then(function (data) {
-            console.log(">>>>>>>> data : ", data)
             if (data){
                 $(order_screen).html(QWeb.render('OrderDetail', {
                     order: data[0],
@@ -71,9 +69,8 @@ var OrderProcessDashboard = AbstractAction.extend({
         $(ev.currentTarget).addClass('active');
         var state = $(ev.currentTarget).data('state')
         var domain = false;
-        console.log(">>>>>>>>>> state: ", state)
-        if (state === 'all'){
-            domain = [['state', '=', 'sale']];
+        if (state === 'order'){
+            domain = [['state', '=', 'sale'],['apty_order_state', '=', state]];
         }
         else {
             domain = [['state', '=', 'sale'],['apty_order_state', '=', state]];
@@ -96,14 +93,16 @@ var OrderProcessDashboard = AbstractAction.extend({
     _process_order: function(ev) {
         var order_id = $(ev.currentTarget).parents().find('.details').data('order-id');
         var state = $(ev.currentTarget).data('new-state');
-        var order_row = $('.order-row[data-order-id='+ order_id +']');
+        var new_state = $('.state-btn[data-state='+ state +']');
+        console.log(">>>>>>>> state ", state)
+        console.log("?????????????", $('.state-btn[data-state='+ state +']'));
+        
         rpc.query({
             model: 'sale.order',
             method: 'write',
             args: [parseInt(order_id), {'apty_order_state': state}],
         }).then(function (data) {
-            console.log("data :  : : : ", data)
-            $(order_row).trigger('click');
+            $(new_state).trigger('click');
         });
     },
 

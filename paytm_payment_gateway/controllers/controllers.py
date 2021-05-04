@@ -49,6 +49,10 @@ class AtomController(http.Controller):
             payment_transaction = request.env['payment.transaction'].sudo().browse(int(json_data.get('payment_tx_id')))
             payment_transaction._reconcile_after_transaction_done()
             staus = True
+            if payment_transaction and payment_transaction.partner_id:
+                payment_transaction.partner_id.write({
+                    'coupon_used': True
+                })
         return staus
 
 

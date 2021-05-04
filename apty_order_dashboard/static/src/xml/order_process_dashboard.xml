@@ -26,7 +26,7 @@
               </div>
               <div class="card-body">
                 <div class="row state-row">
-                  <div class="col-md-2"><button class="btn btn-lg btn-primary state-btn active" data-state="all">All</button></div>
+                  <div class="col-md-2"><button class="btn btn-lg btn-primary state-btn active" data-state="order">Placed</button></div>
                   <div class="col-md-2"><button class="btn btn-lg btn-primary state-btn" data-state="preparing">Preparing</button></div>
                   <div class="col-md-2"><button class="btn btn-lg btn-primary state-btn" data-state="ready">Ready</button></div>
                   <div class="col-md-2"><button class="btn btn-lg btn-primary state-btn" data-state="picked">Picked</button></div>
@@ -47,11 +47,13 @@
                     <thead class="text-warning">
                       <th>Reference #</th>
                       <th>Customer</th>
+                      <th>Source</th>
                     </thead>
                     <tbody class="list-order">
                       <tr class="order-row">
                         <td>&amp;nbsp;</td>
                         <td>No Data found</td>
+                        <td>&amp;nbsp;</td>
                       </tr>
                     </tbody>
                   </table>
@@ -95,7 +97,7 @@
             Current Status : <t t-esc="order.apty_order_state"/>
           </div>
           <div class="row">
-            <t t-if="order.apty_order_state == 'draft'">
+            <t t-if="order.apty_order_state == 'order'">
               <button class="btn btn-primary process-order" data-new-state="preparing">
                 Accept
               </button>
@@ -155,7 +157,7 @@
       </table>
       <h4 class="text-right mt32">
         <hr/>
-        <p>Untaxed Amount : <t t-esc="order.untaxed_amount"/></p>
+        <p>Untaxed Amount : <t t-esc="order.amount_untaxed"/></p>
         <p>Tax : <t t-esc="order.amount_tax"/></p>
         <hr/>
         <p>Total : <t t-esc="order.amount_total"/></p>

@@ -280,6 +280,9 @@ class WebsiteSale(WebsiteSale):
                 values.update({
                     'commitment_date': json_data.get('delivery_date')
                 })
+            if order and order.partner_id: 
+                if not order.partner_id.coupon_used:
+                    order.recompute_coupon_lines()
             ctx.update({
                 'force_company': order.company_id.id,
                 'allowed_company_ids':[order.company_id.id]
