@@ -37,6 +37,10 @@ class SaleOrderDashboardInherit(models.Model):
                     tax = self.env['account.tax'].search([('id', '=', tax)])
                     taxes += tax.name + ', '
             line['tax_id'] = taxes
+        transaction_id = self.env['payment.transaction'].search([('sale_order_ids', 'in', order[0].get('id'))], limit=1, order="id DESC")
+        print(">>>>>>>>>>. transaction ", transaction_id, transaction_id.acquirer_id)
         order[0]['order_line'] = order_lines
         order[0]['partner_id'] = partner_id
+        order[0]['model'] = 'sale.order'
+        order[0]['payment_mode'] = transaction_id.acquirer_id.provider
         return order

@@ -1,0 +1,20 @@
+# -*- coding: utf-8 -*-
+from odoo import http
+from odoo.http import request
+
+
+class AptyChoiceDashboard(http.Controller):
+
+    @http.route("/get_order_list", type="json", auth="user")
+    def get_order_list(self, **kwargs):
+        apty_order_state = kwargs.get('state')
+        sale_orders = request.env['sale.order'].search_read([('state', '=', 'sale'), ('apty_order_state', '=', apty_order_state)], ['id', 'name', 'partner_id', 'write_date'])
+        for so in sale_orders:
+            so['model'] = 'sale.order'
+        pos_orders = request.env['pos.order'].search_read([('state', '=', 'paid'), ('apty_order_state', '=', apty_order_state)], ['id', 'name', 'partner_id', 'write_date'])
+        for po in pos_orders:
+            po['model'] = 'pos.order'
+            if not po.get('partner_id'):
+                po['partner_id'] = ('', '')
+        res = sorted(sale_orders + pos_orders, key=lambda d: d['write_date'], reverse=True)
+        return {"orders": res or []}

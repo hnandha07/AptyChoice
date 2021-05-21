@@ -6,4 +6,23 @@ class PoSOrderInherit(models.Model):
     _inherit = 'pos.order'
 
     apty_order_state = fields.Selection(selection=[('draft', 'Draft'), ('order', 'Order'), ('preparing', 'Preparing'), ('ready', 'Ready'), ('picked', 'Picked'), ('delivered', 'Delivered'), ('cancel', 'Cancel')], 
-                                        string="Apty Order State",)
+                                        string="Apty Order State", default='order')
+
+    def get_order_details(self):
+        order = self.search_read([('id', 'in', self.id)], [])
+        order_lines = self.env['pos.order.line'].search_read([('order_id', 'in', self.id)], [])
+        if order and order[0].get('partner_id'):
+            partner_id = self.env['res.partner'].search_read([('id', '=', order[0].get('partner_id')[0])], [])
+        else:
+            partner_id = ('', '')
+        for line in order_lines:
+            taxes = ''
+            if line.get('tax_id'):
+                for tax in line.get('tax_id'):
+                    tax = self.env['account.tax'].search([('id', '=', tax)])
+                    taxes += tax.name + ', '
+            line['tax_id'] = taxes
+        order[0]['order_line'] = order_lines
+        order[0]['partner_id'] = partner_id
+        order[0]['model'] = 'pos.order'
+        return order

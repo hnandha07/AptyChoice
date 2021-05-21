@@ -28,27 +28,33 @@ var OrderProcessDashboard = AbstractAction.extend({
         var apty_list = this.$el.find('.list-order');
         // var src = "/apty_order_dashboard/static/src/sounds/notification.mp3";
         // $('body').append('<audio id="notification" src="'+src+'" autoplay="true"></audio>');
-        rpc.query({
-                    model: 'sale.order',
-                    method: 'get_order_data',
-                    args: [[['state', '=', 'sale'],['apty_order_state', '=', 'order']], ['name', 'id', 'partner_id', 'apty_order_state']],
-                }).then(function (data) {
-                    if (data.length) {
-                        $(apty_list).find('tr').remove();
-                        _.each(data, function(order) {
-                            var tr_string = "<tr class='order-row' data-order-id="+ order['id'] +"><td>"+order['name']+"</td><td>"+order['partner_id'][1]+"</td><td>Portal</td></tr>";
-                            $(apty_list).append(tr_string);
-                        });
-                    } 
+        ajax.rpc("/get_order_list", {
+            "state": "order",
+        }).then(function (data) {
+            if(data['orders'].length){
+                $(apty_list).find('tr').remove();
+                _.each(data['orders'], function(order) {
+                    var model_string = '';
+                    if (order['model'] == 'pos.order'){
+                        model_string = 'Point of Sale';
+                    }
+                    else{
+                        model_string = 'Sales Portal'
+                    }
+                    var tr_string = "<tr class='order-row' data-order-id="+ order['id'] +" data-model="+ order['model'] +"><td>"+order['name']+"</td><td>"+order['partner_id'][1]+"</td><td>"+ model_string +"</td></tr>";
+                    $(apty_list).append(tr_string);
                 });
+            }
+        });
     return this;
     },
 
     _display_details: function(ev) {
         var order_id = $(ev.currentTarget).data('order-id');
         var order_screen = $('.order-details');
+        var order_model = $(ev.currentTarget).data('model');
         rpc.query({
-            model: 'sale.order',
+            model: order_model,
             method: 'get_order_details',
             args: [[[parseInt(order_id)]]],
         }).then(function (data) {
@@ -70,20 +76,25 @@ var OrderProcessDashboard = AbstractAction.extend({
         var state = $(ev.currentTarget).data('state')
         var domain = false;
         if (state === 'order'){
-            domain = [['state', '=', 'sale'],['apty_order_state', '=', state]];
+            domain = [['apty_order_state', '=', state]];
         }
         else {
-            domain = [['state', '=', 'sale'],['apty_order_state', '=', state]];
+            domain = [['apty_order_state', '=', state]];
         }
-        rpc.query({
-            model: 'sale.order',
-            method: 'search_read',
-            args: [domain, ['name', 'id', 'partner_id', 'apty_order_state']],
+        ajax.rpc("/get_order_list", {
+            "state": state,
         }).then(function (data) {
-            if (data.length) {
+            if(data['orders'].length){
                 $(apty_list).find('tr').remove();
-                _.each(data, function(order) {
-                    var tr_string = "<tr class='order-row' data-order-id="+ order['id'] +"><td>"+order['name']+"</td><td>"+order['partner_id'][1]+"</td></tr>";
+                _.each(data['orders'], function(order) {
+                    var model_string = '';
+                    if (order['model'] == 'pos.order'){
+                        model_string = 'Point of Sale';
+                    }
+                    else{
+                        model_string = 'Sales Portal'
+                    }
+                    var tr_string = "<tr class='order-row' data-order-id="+ order['id'] +" data-model="+ order['model'] +"><td>"+order['name']+"</td><td>"+order['partner_id'][1]+"</td><td>"+ model_string +"</td></tr>";
                     $(apty_list).append(tr_string);
                 });
             }
@@ -92,13 +103,15 @@ var OrderProcessDashboard = AbstractAction.extend({
 
     _process_order: function(ev) {
         var order_id = $(ev.currentTarget).parents().find('.details').data('order-id');
+        var active_model = $(ev.currentTarget).parents().find('.details').data('model');
         var state = $(ev.currentTarget).data('new-state');
         var new_state = $('.state-btn[data-state='+ state +']');
-        console.log(">>>>>>>> state ", state)
-        console.log("?????????????", $('.state-btn[data-state='+ state +']'));
+        if (active_model === 'sale.order' && new_state === 'delivered'){
+            console.log("COD")
+        }
         
         rpc.query({
-            model: 'sale.order',
+            model: active_model,
             method: 'write',
             args: [parseInt(order_id), {'apty_order_state': state}],
         }).then(function (data) {

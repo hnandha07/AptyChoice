@@ -80,13 +80,13 @@
   </t>
 
   <t t-name="OrderDetail">
-    <div class="row details" t-att-data-order-id="order.id">
+    <div class="row details" t-att-data-order-id="order.id" t-att-data-model="order.model" t-att-data-payment-type="order.payment_mode or ''">
       <div class="col-lg-12 col-md-12 text-center">
         <h2><t t-esc="order.name"/></h2>
       </div>
       <div class="col-md-6">
         <p>Customer: <t t-esc="partner['name']"/></p>
-        <p>Contact Number : <t t-esc="partner['phone']"/></p>
+        <p>Contact Number : <t t-esc="partner['mobile']"/></p>
         <p>Email : <t t-esc="partner['email']"/></p>
         <p><t t-esc="partner['street']"/>, <t t-esc="partner['street2'] or ''"/></p>
         <p><t t-esc="partner['city']"/>, <t t-esc="partner['zip']"/></p>
