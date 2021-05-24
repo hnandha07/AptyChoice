@@ -27,6 +27,7 @@ class SaleOrderDashboardInherit(models.Model):
     #     return res
 
     def get_order_details(self):
+        print('---sale order-')
         order = self.search_read([('id', 'in', self.id)], [])
         order_lines = self.env['sale.order.line'].search_read([('order_id', 'in', self.id)], [])
         partner_id = self.env['res.partner'].search_read([('id', '=', order[0].get('partner_id')[0])], [])

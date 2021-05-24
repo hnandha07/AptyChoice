@@ -17,6 +17,8 @@
     <template id="assets_backend_order_dashboard" name="Order Dashboard assets inherit" inherit_id="web.assets_backend">
         <xpath expr="." position="inside">
             <script type="text/javascript" src="/apty_order_dashboard/static/src/js/order_dashboard.js"/>
+            <script type="text/javascript" src="/apty_order_dashboard/static/src/js/pos_extend.js"/>
+
         </xpath>
     </template>
 </odoo>

@@ -1009,3 +1009,57 @@ h4 .stat-count {
   border-bottom: 3px solid transparent;
   border-top: 3px solid #1e5799;
 }
+
+.pos-receipt-container {
+    font-size: 0.75em;
+    text-align: center;
+    direction: ltr;
+    font-family: "Lato","Lucida Grande", Helvetica, Verdana, Arial;
+}
+
+.pos-receipt-container > div {
+    text-align: left;
+    width: 300px;
+    background-color: white;
+    margin: 20px;
+    padding: 15px;
+    font-size: 16px;
+    padding-bottom:30px;
+    display: inline-block;
+    border: solid 1px rgb(220,220,220);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.pos-receipt .pos-receipt-contact {
+    text-align: center;
+    font-size: 75%;
+}
+
+.pos-receipt .pos-receipt-right-align {
+    float: right;
+}
+
+.pos-receipt .pos-receipt-amount {
+    font-size: 125%;
+    padding-left: 6em;
+}
+.pos-receipt .pos-receipt-right-align {
+    float: right;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .pos-receipt-container * {
+    visibility: visible;
+  }
+
+  ./*pos-receipt-container {
+    position: absolute;
+    left: 0;
+    top: 5%;
+  }*/
+}

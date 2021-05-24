@@ -1,6 +1,6 @@
 odoo.define('order_dashboard.Dashboard', function (require) {
 "use strict";
-
+console.log('-------dddd')
 var AbstractAction = require('web.AbstractAction');
 var ajax = require('web.ajax');
 var core = require('web.core');
@@ -19,6 +19,9 @@ var OrderProcessDashboard = AbstractAction.extend({
         "click .process-order": '_process_order',
         "click .order-cancel": '_order_cancel',
         "click .confirm-cancel": '_confirm_cancel',
+        "click .print-order": '_print_order',
+        "click .js_custom_print": '_js_custom_print',
+
     },
 
     start: function () {
@@ -31,6 +34,7 @@ var OrderProcessDashboard = AbstractAction.extend({
         ajax.rpc("/get_order_list", {
             "state": "order",
         }).then(function (data) {
+            console.log('------data 1', data)
             if(data['orders'].length){
                 $(apty_list).find('tr').remove();
                 _.each(data['orders'], function(order) {
@@ -59,6 +63,7 @@ var OrderProcessDashboard = AbstractAction.extend({
             args: [[[parseInt(order_id)]]],
         }).then(function (data) {
             if (data){
+                console.log('----data----', data)
                 $(order_screen).html(QWeb.render('OrderDetail', {
                     order: data[0],
                     partner: data[0]['partner_id'][0],
@@ -121,7 +126,17 @@ var OrderProcessDashboard = AbstractAction.extend({
 
     _order_cancel: function (ev) {
         $('#cancel-confirmation').modal('toggle');
-    }, 
+    },
+
+    _print_order: function (ev) {
+        $('#print-confirmation').modal('toggle');
+        $('.pos-receipt-container')
+    },
+
+    _js_custom_print: function (ev) {
+        console.log('------window------', window)
+        window.print();
+    },
 
     _confirm_cancel: function (ev) {
         var order_id = $(ev.currentTarget).data('order-id');

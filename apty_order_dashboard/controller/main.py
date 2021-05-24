@@ -16,5 +16,9 @@ class AptyChoiceDashboard(http.Controller):
             po['model'] = 'pos.order'
             if not po.get('partner_id'):
                 po['partner_id'] = ('', '')
+            # if po.get('company_id')[0]:
+            #     company_details = request.env['res.company'].sudo().search([('id', '=', po.get('company_id')[0])])
+            #     po['company_id'] = (company_details.name, company_details.phone, company_details.vat, company_details.email, company_details.website)
+            #     print('----company_details--', company_details)
         res = sorted(sale_orders + pos_orders, key=lambda d: d['write_date'], reverse=True)
         return {"orders": res or []}

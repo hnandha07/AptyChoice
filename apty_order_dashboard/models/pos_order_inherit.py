@@ -9,8 +9,14 @@ class PoSOrderInherit(models.Model):
                                         string="Apty Order State", default='order')
 
     def get_order_details(self):
+        print('-----pod order--')
         order = self.search_read([('id', 'in', self.id)], [])
         order_lines = self.env['pos.order.line'].search_read([('order_id', 'in', self.id)], [])
+        if order[0]['company_id']:
+            print('-order.company_id-----', order[0]['company_id'])
+            company_details = self.env['res.company'].sudo().search([('id', '=', order[0]['company_id'][0])])
+            print('---company_details---', company_details)
+            order[0]['company_id'] = (company_details.name, company_details.phone, company_details.vat, company_details.email, company_details.website)
         if order and order[0].get('partner_id'):
             partner_id = self.env['res.partner'].search_read([('id', '=', order[0].get('partner_id')[0])], [])
         else:
@@ -25,4 +31,7 @@ class PoSOrderInherit(models.Model):
         order[0]['order_line'] = order_lines
         order[0]['partner_id'] = partner_id
         order[0]['model'] = 'pos.order'
+
+        print('---orders', order)
+        print('---orders', order[0]['order_line'])
         return order
