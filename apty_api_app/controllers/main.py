@@ -280,9 +280,18 @@ class WebsiteSale(WebsiteSale):
                 values.update({
                     'commitment_date': json_data.get('delivery_date')
                 })
-            if order and order.partner_id: 
+            if order and order.partner_id and mode == 'new': 
                 if not order.partner_id.coupon_used:
-                    order.recompute_coupon_lines()
+                    discount_product = request.env['product.product'].sudo().search([('name', 'ilike', 'discount')], limit=1, order='id desc')
+                    order_line = {
+                        'product_id': discount_product.id,
+                        'product_uom_qty': 1,
+                        'price_unit': -100,
+                        'price_subtotal': -100
+                    }
+                    order.write({
+                        'order_line': [(0, 0, order_line)]
+                    })
             ctx.update({
                 'force_company': order.company_id.id,
                 'allowed_company_ids':[order.company_id.id]

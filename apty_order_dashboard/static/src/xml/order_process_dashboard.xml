@@ -87,7 +87,7 @@
       </div>
         <div class="col-md-6">
         <p>Customer: <t t-esc="partner['name']"/></p>
-            <p>Contact Number : <t t-esc="partner['mobile']"/></p>
+            <p>Contact Number : <t t-esc="partner['mobile'] or partner['phone']"/></p>
             <p>Email : <t t-esc="partner['email']"/></p>
             <p><t t-esc="partner['street']"/>,
                 <t t-esc="partner['street2'] or ''"/></p>
