@@ -1,6 +1,5 @@
 odoo.define('pos_extend.pos', function (require) {
 'use strict';
-console.log('--------custom js');
 //var models = require('point_of_sale.models');
 //console.log('-------models', models)
 //var core = require('web.core');

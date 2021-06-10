@@ -1,6 +1,5 @@
 odoo.define('order_dashboard.Dashboard', function (require) {
 "use strict";
-console.log('-------dddd')
 var AbstractAction = require('web.AbstractAction');
 var ajax = require('web.ajax');
 var core = require('web.core');
@@ -29,12 +28,25 @@ var OrderProcessDashboard = AbstractAction.extend({
         var args = arguments;
         var sup = this._super;
         var apty_list = this.$el.find('.list-order');
+        var apty_order_table = this.$el.find('#order-list-table');
         // var src = "/apty_order_dashboard/static/src/sounds/notification.mp3";
         // $('body').append('<audio id="notification" src="'+src+'" autoplay="true"></audio>');
+        console.log(">>>>>>>>>>>",  this.$el.find('#order-list-table'))
+        var dt_order = $(apty_order_table).DataTable({
+            destroy: true,
+            pageLength : 5,
+            searching: false,
+            ordering:  false,
+            bLengthChange: false,
+            createdRow: function( row, data, dataIndex ) {
+                $(row).attr('data-order-id', data[3]);
+                $(row).attr('data-model', data[4]);
+                $(row).addClass("order-row");
+            }
+        });
         ajax.rpc("/get_order_list", {
             "state": "order",
         }).then(function (data) {
-            console.log('------data 1', data)
             if(data['orders'].length){
                 $(apty_list).find('tr').remove();
                 _.each(data['orders'], function(order) {
@@ -45,8 +57,13 @@ var OrderProcessDashboard = AbstractAction.extend({
                     else{
                         model_string = 'Sales Portal'
                     }
-                    var tr_string = "<tr class='order-row' data-order-id="+ order['id'] +" data-model="+ order['model'] +"><td>"+order['name']+"</td><td>"+order['partner_id'][1]+"</td><td>"+ model_string +"</td></tr>";
-                    $(apty_list).append(tr_string);
+                    dt_order.row.add([
+                        order['name'],
+                        order['partner_id'][1],
+                        model_string,
+                        order['id'],
+                        order['model']
+                    ]).draw( false );
                 });
             }
         });
@@ -63,7 +80,6 @@ var OrderProcessDashboard = AbstractAction.extend({
             args: [[[parseInt(order_id)]]],
         }).then(function (data) {
             if (data){
-                console.log('----data----', data)
                 $(order_screen).html(QWeb.render('OrderDetail', {
                     order: data[0],
                     partner: data[0]['partner_id'][0],
@@ -153,6 +169,7 @@ var OrderProcessDashboard = AbstractAction.extend({
     },
 });
 core.action_registry.add('order_process_dashboard', OrderProcessDashboard);
+
 
 return OrderProcessDashboard;
 

@@ -18,7 +18,7 @@
         <xpath expr="." position="inside">
             <script type="text/javascript" src="/apty_order_dashboard/static/src/js/order_dashboard.js"/>
             <script type="text/javascript" src="/apty_order_dashboard/static/src/js/pos_extend.js"/>
-
+            <script type="text/javascript" src="/apty_order_dashboard/static/src/js/jquery.datatable.min.js"/>
         </xpath>
     </template>
 </odoo>

@@ -5,6 +5,8 @@
       <link rel="stylesheet" href="/apty_order_dashboard/static/src/css/demo.css"/>
         <link rel="stylesheet" href="/apty_order_dashboard/static/src/css/material-dashboard.css"/>
         <link rel="stylesheet" href="/apty_order_dashboard/static/src/css/dashboard_style.css"/>
+        <link rel="stylesheet" href="/apty_order_dashboard/static/src/css/jquery.datatable.min.css"/>
+        
         <div class="sidebar" data-color="purple" data-background-color="white">
         <div class="sidebar-wrapper">
           <ul class="nav">
@@ -43,19 +45,13 @@
                   <h4 class="card-title">Recent Orders</h4>
                 </div>
                   <div class="card-body table-responsive">
-                  <table class="table table-hover">
+                  <table class="table table-hover" id="order-list-table">
                     <thead class="text-warning">
                       <th>Reference #</th>
                         <th>Customer</th>
                         <th>Source</th>
                     </thead>
-                      <tbody class="list-order">
-                      <tr class="order-row">
-                        <td>&amp;nbsp;</td>
-                          <td>No Data found</td>
-                          <td>&amp;nbsp;</td>
-                      </tr>
-                    </tbody>
+                      <tbody class="list-order"></tbody>
                   </table>
                 </div>
               </div>
