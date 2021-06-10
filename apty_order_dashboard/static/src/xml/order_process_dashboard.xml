@@ -92,9 +92,18 @@
         </div>
         <div class="col-md-6">
         <t t-if="order.apty_choice_state != 'cancel'">
-          <div class="row text-capitalize">
+            <div class="row text-capitalize">
+            Order ID : <t t-esc="order.id"/>
+          </div>
+            <br/>
+            <div class="row text-capitalize">
             Current Status : <t t-esc="order.apty_order_state"/>
           </div>
+            <br/>
+            <div class="row text-capitalize">
+            Order Date : <t t-esc="order.date_order"/>
+          </div>
+            <br/>
             <div class="row">
             <t t-if="order.apty_order_state == 'order'">
               <button class="btn btn-primary process-order" data-new-state="preparing">
@@ -259,7 +268,7 @@
                         <br/>
                         <br/>
 
-                         <div   >
+                        <div>
                             Cash
                             <span t-esc='order.amount_paid + order.amount_return'
                                   class="pos-receipt-right-align"/>
@@ -282,7 +291,7 @@
 
                         <br/>
                         <div class="pos-receipt-order-data">
-                            <div>Order <t t-esc='order.pos_reference' /></div>
+                            <div>Order <t t-esc='order.pos_reference'/></div>
                             <div><t t-esc='order.create_date' /></div>
                         </div>
                     </div>
