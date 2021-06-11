@@ -7,6 +7,13 @@ class SaleOrderDashboardInherit(models.Model):
 
     reason = fields.Char('Reason')
 
+    sale_order_date = fields.Datetime(string='Sale Order Date', related='create_date')
+    sale_preparing_date = fields.Datetime(string='Sale Order Preparing Date')
+    sale_ready_date = fields.Datetime(string='Sale Order Ready Date')
+    sale_picked_date = fields.Datetime(string='Sale Order Picked Date')
+    sale_delivered_date = fields.Datetime(string='Sale Order Delivered Date')
+    sale_cancelled_date = fields.Datetime(string='Sale Order Cancelled Date')
+
     # def write(self, vals):
     #     res = super(SaleOrderDashboardInherit, self).write(vals)
     #     if vals and vals.get('state') and vals.get('state') == 'sale':

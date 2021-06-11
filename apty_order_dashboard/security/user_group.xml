@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo noupdate="0">
+
+    <record id="npa_group_delivery_person" model="res.groups">
+        <field name="name">Delivery Person</field>
+        <field name="category_id" ref="base.module_category_newspaper_agency"/>
+        <field name="implied_ids" eval="[(4,ref('base.group_user'))]"/>
+    </record>
+
+</odoo>

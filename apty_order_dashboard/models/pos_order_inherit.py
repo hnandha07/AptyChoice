@@ -8,6 +8,13 @@ class PoSOrderInherit(models.Model):
     apty_order_state = fields.Selection(selection=[('draft', 'Draft'), ('order', 'Order'), ('preparing', 'Preparing'), ('ready', 'Ready'), ('picked', 'Picked'), ('delivered', 'Delivered'), ('cancel', 'Cancel')], 
                                         string="Apty Order State", default='order')
 
+    pos_order_date = fields.Datetime(string='POS Preparing Date', related='create_date')
+    pos_preparing_date = fields.Datetime(string='POS Preparing Date')
+    pos_ready_date = fields.Datetime(string='POS Ready Date')
+    pos_picked_date = fields.Datetime(string='POS Picked Date')
+    pos_delivered_date = fields.Datetime(string='POS Delivered Date')
+    pos_cancelled_date = fields.Datetime(string='POS Cancelled Date')
+
     def get_order_details(self):
         order = self.search_read([('id', 'in', self.id)], [])
         order_lines = self.env['pos.order.line'].search_read([('order_id', 'in', self.id)], [])

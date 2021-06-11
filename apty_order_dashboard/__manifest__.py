@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "Apty Order Process",
     'summary': """
@@ -13,10 +12,12 @@
     'version': '1.0',
     'depends': ['npa_base','website_sale', 'point_of_sale'],
     'data': [
+        'security/user_group.xml',
         # 'security/ir.model.access.csv',
-        # 'views/asset.xml',
-        # 'views/kitchen_screen_view.xml',
-        'views/dashboard_views.xml'
+        'views/dashboard_views.xml',
+        'views/pos_order_view.xml',
+        'views/sale_order_view.xml',
     ],
     'qweb': ["static/src/xml/*.xml"],
 }
+# -*- coding: utf-8 -*-
