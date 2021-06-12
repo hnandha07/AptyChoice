@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <record id="pos_view_inherit" model="ir.ui.view">
-            <field name="name">pos.order.inherit</field>
-            <field name="model">pos.order</field>
-            <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//page[@name='extra']/group/group[2]" position="after">
+        <field name="name">pos.order.inherit</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='extra']/group/group[2]" position="after">
+                <group>
                     <group string="Date And Time Stamp For Order">
                         <field name="pos_order_date"/>
                         <field name="pos_preparing_date"/>
@@ -14,8 +15,17 @@
                         <field name="pos_delivered_date"/>
                         <field name="pos_cancelled_date"/>
                     </group>
-                </xpath>
+                    <group string="Order By">
+                        <field name="pos_order_by"/>
+                        <field name="pos_preparing_by"/>
+                        <field name="pos_ready_by"/>
+                        <field name="pos_picked_by"/>
+                        <field name="pos_delivered_by"/>
+                        <field name="pos_cancelled_by"/>
+                    </group>
+                </group>
+            </xpath>
 
-            </field>
+        </field>
     </record>
 </odoo>

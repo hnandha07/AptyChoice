@@ -8,12 +8,18 @@ class PoSOrderInherit(models.Model):
     apty_order_state = fields.Selection(selection=[('draft', 'Draft'), ('order', 'Order'), ('preparing', 'Preparing'), ('ready', 'Ready'), ('picked', 'Picked'), ('delivered', 'Delivered'), ('cancel', 'Cancel')], 
                                         string="Apty Order State", default='order')
 
-    pos_order_date = fields.Datetime(string='POS Preparing Date', related='create_date')
-    pos_preparing_date = fields.Datetime(string='POS Preparing Date')
-    pos_ready_date = fields.Datetime(string='POS Ready Date')
-    pos_picked_date = fields.Datetime(string='POS Picked Date')
-    pos_delivered_date = fields.Datetime(string='POS Delivered Date')
-    pos_cancelled_date = fields.Datetime(string='POS Cancelled Date')
+    pos_order_date = fields.Datetime(string='Order Date', related='create_date')
+    pos_order_by = fields.Many2one('res.users', string='Order Date')
+    pos_preparing_date = fields.Datetime(string='Preparing Date')
+    pos_preparing_by = fields.Many2one('res.users', string='Preparing By')
+    pos_ready_date = fields.Datetime(string='Ready Date')
+    pos_ready_by = fields.Many2one('res.users', string='Ready By')
+    pos_picked_date = fields.Datetime(string='Picked Date')
+    pos_picked_by = fields.Many2one('res.users', string='Picked By')
+    pos_delivered_date = fields.Datetime(string='Delivered Date')
+    pos_delivered_by = fields.Many2one('res.users', string='Delivered By')
+    pos_cancelled_date = fields.Datetime(string='Cancelled Date')
+    pos_cancelled_by = fields.Many2one('res.users', string='Cancelled By')
 
     def get_order_details(self):
         order = self.search_read([('id', 'in', self.id)], [])

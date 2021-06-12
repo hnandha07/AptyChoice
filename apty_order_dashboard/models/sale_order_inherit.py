@@ -7,12 +7,18 @@ class SaleOrderDashboardInherit(models.Model):
 
     reason = fields.Char('Reason')
 
-    sale_order_date = fields.Datetime(string='Sale Order Date', related='create_date')
-    sale_preparing_date = fields.Datetime(string='Sale Order Preparing Date')
-    sale_ready_date = fields.Datetime(string='Sale Order Ready Date')
-    sale_picked_date = fields.Datetime(string='Sale Order Picked Date')
-    sale_delivered_date = fields.Datetime(string='Sale Order Delivered Date')
-    sale_cancelled_date = fields.Datetime(string='Sale Order Cancelled Date')
+    sale_order_date = fields.Datetime(string='Order Date', related='create_date')
+    sale_order_by = fields.Many2one('res.users', string='Order By')
+    sale_preparing_date = fields.Datetime(string='Preparing Date')
+    sale_preparing_by = fields.Many2one('res.users', string='Preparing By')
+    sale_ready_date = fields.Datetime(string='Ready Date')
+    sale_ready_by = fields.Many2one('res.users', string='Ready By')
+    sale_picked_date = fields.Datetime(string='Picked Date')
+    sale_picked_by = fields.Many2one('res.users', string='Picked By')
+    sale_delivered_date = fields.Datetime(string='Delivered Date')
+    sale_delivered_by = fields.Many2one('res.users', string='Delivered By')
+    sale_cancelled_date = fields.Datetime(string='Cancelled Date')
+    sale_cancelled_by = fields.Many2one('res.users', string='Cancelled By')
 
     # def write(self, vals):
     #     res = super(SaleOrderDashboardInherit, self).write(vals)
