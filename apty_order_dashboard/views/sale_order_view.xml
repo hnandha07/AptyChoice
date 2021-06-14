@@ -8,20 +8,20 @@
             <xpath expr="//page[@name='other_information']/group[1]/group[2]" position="after">
                 <group>
                     <group string="Date And Time Stamp For Order">
-                        <field name="sale_order_date"/>
-                        <field name="sale_preparing_date"/>
-                        <field name="sale_ready_date"/>
-                        <field name="sale_picked_date"/>
-                        <field name="sale_delivered_date"/>
-                        <field name="sale_cancelled_date"/>
+                        <field name="order_date"/>
+                        <field name="preparing_date"/>
+                        <field name="ready_date"/>
+                        <field name="picked_date"/>
+                        <field name="delivered_date"/>
+                        <field name="cancelled_date"/>
                     </group>
                     <group string="Order By">
-                        <field name="sale_order_by"/>
-                        <field name="sale_preparing_by"/>
-                        <field name="sale_ready_by"/>
-                        <field name="sale_picked_by"/>
-                        <field name="sale_delivered_by"/>
-                        <field name="sale_cancelled_by"/>
+                        <field name="order_by"/>
+                        <field name="preparing_by"/>
+                        <field name="ready_by"/>
+                        <field name="picked_by"/>
+                        <field name="delivered_by"/>
+                        <field name="cancelled_by"/>
                     </group>
                 </group>
             </xpath>

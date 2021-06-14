@@ -22,3 +22,16 @@ class AptyChoiceDashboard(http.Controller):
             #     print('----company_details--', company_details)
         res = sorted(sale_orders + pos_orders, key=lambda d: d['write_date'], reverse=True)
         return {"orders": res or []}
+
+    @http.route("/get_delivery_partners", type="json", auth="user")
+    def get_delivery_partners(self, **kwargs):
+        partners = []
+        delivery_partner_group = request.env['ir.model.data'].xmlid_to_object('apty_order_dashboard.npa_group_delivery_person')
+        for user in delivery_partner_group.users:
+            partners.append({
+                'id': user.id,
+                'name': user.name,
+                'email': user.email
+            })
+        return { 'partners': partners}
+    

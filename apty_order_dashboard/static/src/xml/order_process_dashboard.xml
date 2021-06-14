@@ -106,22 +106,22 @@
             <br/>
             <div class="row">
             <t t-if="order.apty_order_state == 'order'">
-              <button class="btn btn-primary process-order" data-new-state="preparing">
+              <button class="btn btn-primary process-order" data-old-state="order" data-new-state="preparing">
                 Accept
               </button>
             </t>
                 <t t-if="order.apty_order_state == 'preparing'">
-              <button class="btn btn-primary process-order" data-new-state="ready">
+              <button class="btn btn-primary process-order" data-old-state="preparing" data-new-state="ready">
                 Process
               </button>
             </t>
                 <t t-if="order.apty_order_state == 'ready'">
-              <button class="btn btn-primary process-order" data-new-state="picked">
+              <button class="btn btn-primary process-order" data-new-state="picked" data-old-state="ready">
                 Process
               </button>
             </t>
                 <t t-if="order.apty_order_state == 'picked'">
-              <button class="btn btn-primary process-order" data-new-state="delivered">
+              <button class="btn btn-primary process-order" data-new-state="delivered" data-old-state="picked">
                 Process
               </button>
             </t>
@@ -180,7 +180,7 @@
       </h4>
       </div>
     </div>
-        <div role="dialog" class="modal fade" id="cancel-confirmation">
+    <div role="dialog" class="modal fade" id="cancel-confirmation">
       <div class="modal-dialog">
         <div class="modal-content">
             <header class="modal-header">
@@ -198,7 +198,7 @@
         </div>
       </div>
     </div>
-        <div role="dialog" class="modal fade" id="print-confirmation">
+    <div role="dialog" class="modal fade" id="print-confirmation">
       <div class="modal-dialog">
         <div class="modal-content">
             <header class="modal-header">
@@ -300,6 +300,28 @@
             </main>
             <footer class="modal-footer">
               <button class='btn btn-primary js_custom_print' t-att-data-order-id="order.id">Confirm</button>
+                <a role="button" href="#" class="btn btn-link btn-sm" data-dismiss="modal">Close</a>
+            </footer>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assign delivery partner pop-up -->
+    <div role="dialog" class="modal fade" id="assign-delivery-partner">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h4 class="modal-title">Assign Partner for Pickup</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&amp;times;</button>
+            </header>
+            <main class="modal-body">
+                <h3>Please assign delivery partner for the order</h3>
+                <select name="deliery_person" id="delivery_person">
+                  <option>Please Select Partner</option>
+                </select>
+            </main>
+            <footer class="modal-footer">
+              <button class='btn btn-primary confirm-assign' t-att-data-order-id="order.id" t-att-data-model="order.model">Confirm</button>
                 <a role="button" href="#" class="btn btn-link btn-sm" data-dismiss="modal">Close</a>
             </footer>
         </div>

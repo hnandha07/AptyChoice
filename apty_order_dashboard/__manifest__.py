@@ -10,7 +10,7 @@
     'website': "http://www.aptychoice.com",
     'category': 'Extra Tools',
     'version': '1.0',
-    'depends': ['npa_base','website_sale', 'point_of_sale'],
+    'depends': ['npa_base','website_sale', 'point_of_sale', 'pos_sale'],
     'data': [
         'security/user_group.xml',
         # 'security/ir.model.access.csv',

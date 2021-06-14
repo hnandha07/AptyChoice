@@ -9,6 +9,12 @@ var web_client = require('web.web_client');
 var _t = core._t;
 var QWeb = core.qweb;
 
+Number.prototype.padLeft = function(base,chr){
+    var  len = (String(base || 10).length - String(this).length)+1;
+    return len > 0? new Array(len).join(chr || '0')+this : this;
+ }
+     
+
 var OrderProcessDashboard = AbstractAction.extend({
     template: 'OrderProcessDashboardMain',
 
@@ -20,7 +26,7 @@ var OrderProcessDashboard = AbstractAction.extend({
         "click .confirm-cancel": '_confirm_cancel',
         "click .print-order": '_print_order',
         "click .js_custom_print": '_js_custom_print',
-
+        "click .confirm-assign": '_confirm_assign',
     },
 
     start: function () {
@@ -31,7 +37,6 @@ var OrderProcessDashboard = AbstractAction.extend({
         var apty_order_table = this.$el.find('#order-list-table');
         // var src = "/apty_order_dashboard/static/src/sounds/notification.mp3";
         // $('body').append('<audio id="notification" src="'+src+'" autoplay="true"></audio>');
-        console.log(">>>>>>>>>>>",  this.$el.find('#order-list-table'))
         var dt_order = $(apty_order_table).DataTable({
             destroy: true,
             pageLength : 5,
@@ -126,18 +131,45 @@ var OrderProcessDashboard = AbstractAction.extend({
         var order_id = $(ev.currentTarget).parents().find('.details').data('order-id');
         var active_model = $(ev.currentTarget).parents().find('.details').data('model');
         var state = $(ev.currentTarget).data('new-state');
+        var delivery_popup = $('#assign-delivery-partner');
+        var delivery_list = $(delivery_popup).find('#delivery_person');
         var new_state = $('.state-btn[data-state='+ state +']');
-        if (active_model === 'sale.order' && new_state === 'delivered'){
+        var old_state = $(ev.currentTarget).data('old-state');
+        var update_date = old_state + '_date';
+        var update_by = old_state + '_by';
+        var d = new Date();
+        var dformat = [ d.getFullYear(), (d.getMonth()+1).padLeft(), d.getDate().padLeft()].join('-')+
+            ' ' +
+          [ d.getUTCHours().padLeft(), d.getUTCMinutes().padLeft(), d.getUTCSeconds().padLeft()].join(':');
+        if (active_model === 'sale.order' && state === 'delivered'){
             console.log("COD")
         }
-        
-        rpc.query({
-            model: active_model,
-            method: 'write',
-            args: [parseInt(order_id), {'apty_order_state': state}],
-        }).then(function (data) {
-            $(new_state).trigger('click');
-        });
+        else{
+            if (state === 'picked'){
+                ajax.rpc("/get_delivery_partners", {
+                }).then(function ( partners ) {
+                    $(delivery_list).empty()
+                    _.each(partners['partners'], function (partner) {
+                        $(delivery_list).append('<option value='+ partner['id'] +'>'+ partner['name'] +'</option>')
+                    });
+                    $(delivery_popup).modal('toggle');
+                });
+            }
+            else{
+                var args_c = {
+                    'apty_order_state': state,
+                }
+                args_c[update_by] = session.uid;
+                args_c[update_date] =  dformat,
+                rpc.query({
+                    model: active_model,
+                    method: 'write',
+                    args: [parseInt(order_id), args_c],
+                }).then(function (data) {
+                    $(new_state).trigger('click');
+                });
+            }
+        }
     },
 
     _order_cancel: function (ev) {
@@ -150,7 +182,6 @@ var OrderProcessDashboard = AbstractAction.extend({
     },
 
     _js_custom_print: function (ev) {
-        console.log('------window------', window)
         window.print();
     },
 
@@ -167,6 +198,30 @@ var OrderProcessDashboard = AbstractAction.extend({
             $(order_row).trigger('click');
         });
     },
+
+    _confirm_assign: function (ev) {
+        var order_id = $(ev.currentTarget).data('order-id');
+        var confirm_modal = $('#assign-delivery-partner');
+        var order_row = $('.order-row[data-order-id='+ order_id +']');
+        var partner_selected = $( "#delivery_person option:selected" ).val();
+        var active_model = $(ev.currentTarget).data('model');
+        var d = new Date();
+        var dformat = [ d.getFullYear(), (d.getMonth()+1).padLeft(), d.getDate().padLeft()].join('-')+
+            ' ' +
+          [ d.getUTCHours().padLeft(), d.getUTCMinutes().padLeft(), d.getUTCSeconds().padLeft()].join(':');
+        rpc.query({
+            model: active_model,
+            method: 'write',
+            args: [parseInt(order_id), {
+                'picked_by': parseInt(partner_selected),
+                'apty_order_state': 'picked',
+                'picked_date': dformat,
+            }]
+        }).then( function (data) {
+            $(confirm_modal).modal('toggle');
+            $(order_row).trigger('click');
+        });
+    }
 });
 core.action_registry.add('order_process_dashboard', OrderProcessDashboard);
 
