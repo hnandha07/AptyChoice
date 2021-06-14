@@ -94,12 +94,25 @@ var OrderProcessDashboard = AbstractAction.extend({
     },
 
     _change_state: function(ev) {
-        var apty_list = $(ev.currentTarget).parents().find('.list-order');
-        $(ev.currentTarget).parents().find('.list-order').empty();
+        var apty_list = this.$el.find('.list-order');
+        var apty_order_table = this.$el.find('#order-list-table');
         $('.state-row').find('.active').removeClass('active');
         $('.details').empty();
         $(ev.currentTarget).addClass('active');
-        var state = $(ev.currentTarget).data('state')
+        var state = $(ev.currentTarget).data('state');
+        $(apty_order_table).DataTable().clear();
+        var dt_order = $(apty_order_table).DataTable({
+            destroy: true,
+            pageLength : 5,
+            searching: false,
+            ordering:  false,
+            bLengthChange: false,
+            createdRow: function( row, data, dataIndex ) {
+                $(row).attr('data-order-id', data[3]);
+                $(row).attr('data-model', data[4]);
+                $(row).addClass("order-row");
+            }
+        });
         var domain = false;
         if (state === 'order'){
             domain = [['apty_order_state', '=', state]];
@@ -120,8 +133,13 @@ var OrderProcessDashboard = AbstractAction.extend({
                     else{
                         model_string = 'Sales Portal'
                     }
-                    var tr_string = "<tr class='order-row' data-order-id="+ order['id'] +" data-model="+ order['model'] +"><td>"+order['name']+"</td><td>"+order['partner_id'][1]+"</td><td>"+ model_string +"</td></tr>";
-                    $(apty_list).append(tr_string);
+                    dt_order.row.add([
+                        order['name'],
+                        order['partner_id'][1],
+                        model_string,
+                        order['id'],
+                        order['model']
+                    ]).draw( false );
                 });
             }
         });
@@ -153,6 +171,7 @@ var OrderProcessDashboard = AbstractAction.extend({
                         $(delivery_list).append('<option value='+ partner['id'] +'>'+ partner['name'] +'</option>')
                     });
                     $(delivery_popup).modal('toggle');
+                    $(new_state).trigger('click');
                 });
             }
             else{
