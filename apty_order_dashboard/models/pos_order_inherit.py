@@ -38,6 +38,9 @@ class PoSOrderInherit(models.Model):
                     tax = self.env['account.tax'].search([('id', '=', tax)])
                     taxes += tax.name + ', '
             line['tax_id'] = taxes
+            if line.get('product_id'):
+                product_id = self.env['product.product'].search([('id', '=', line.get('product_id')[0])])
+                line['product_description'] = product_id.description_sale or ''
         order[0]['order_line'] = order_lines
         order[0]['partner_id'] = partner_id
         order[0]['model'] = 'pos.order'

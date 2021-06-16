@@ -47,7 +47,9 @@ class AtomController(http.Controller):
         _logger.info("Payment Confirm JSON Data".format(pprint.pformat(json_data)))
         if len(json_data) and json_data.get('payment_tx_id'):
             payment_transaction = request.env['payment.transaction'].sudo().browse(int(json_data.get('payment_tx_id')))
-            payment_transaction._reconcile_after_transaction_done()
+            payment_transaction._set_transaction_done()
+            payment_transaction._post_process_after_done()
+            # payment_transaction._reconcile_after_transaction_done()
             staus = True
             if payment_transaction and payment_transaction.partner_id:
                 payment_transaction.partner_id.write({

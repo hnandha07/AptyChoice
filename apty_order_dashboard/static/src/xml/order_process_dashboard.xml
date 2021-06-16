@@ -171,12 +171,12 @@
             <tr>
               <td>
               <t t-esc="line.product_id[1]"/>
-                  <br/>
-                  <t t-esc="line.name"/></td>
-                <td><t t-esc="line.product_uom_qty"/></td>
-                <td><t t-esc="line.price_unit"/></td>
-                <td><t t-esc="line.tax_id"/></td>
-                <td><t t-esc="line.price_subtotal"/></td>
+              <br/>
+              <t t-esc="line.product_description"/></td>
+              <td><t t-esc="line.product_uom_qty"/></td>
+              <td><t t-esc="line.price_unit"/></td>
+              <td><t t-esc="line.tax_id"/></td>
+              <td><t t-esc="line.price_subtotal"/></td>
             </tr>
           </t>
         </tbody>
