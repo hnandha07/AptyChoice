@@ -9,7 +9,7 @@ class PoSOrderInherit(models.Model):
                                         string="Apty Order State", default='order')
 
     order_date = fields.Datetime(string='Order Date', related='create_date')
-    order_by = fields.Many2one('res.users', string='Order Date')
+    order_by = fields.Many2one('res.users', string='Order By')
     preparing_date = fields.Datetime(string='Preparing Date')
     preparing_by = fields.Many2one('res.users', string='Preparing By')
     ready_date = fields.Datetime(string='Ready Date')
