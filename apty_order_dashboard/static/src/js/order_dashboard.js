@@ -44,8 +44,8 @@ var OrderProcessDashboard = AbstractAction.extend({
             ordering:  false,
             bLengthChange: false,
             createdRow: function( row, data, dataIndex ) {
-                $(row).attr('data-order-id', data[3]);
-                $(row).attr('data-model', data[4]);
+                $(row).attr('data-order-id', data[4]);
+                $(row).attr('data-model', data[5]);
                 $(row).addClass("order-row");
             }
         });
@@ -66,6 +66,7 @@ var OrderProcessDashboard = AbstractAction.extend({
                         order['name'],
                         order['partner_id'][1],
                         model_string,
+                        order['payment_mode'],
                         order['id'],
                         order['model']
                     ]).draw( false );
@@ -108,8 +109,8 @@ var OrderProcessDashboard = AbstractAction.extend({
             ordering:  false,
             bLengthChange: false,
             createdRow: function( row, data, dataIndex ) {
-                $(row).attr('data-order-id', data[3]);
-                $(row).attr('data-model', data[4]);
+                $(row).attr('data-order-id', data[4]);
+                $(row).attr('data-model', data[5]);
                 $(row).addClass("order-row");
             }
         });
@@ -137,6 +138,7 @@ var OrderProcessDashboard = AbstractAction.extend({
                         order['name'],
                         order['partner_id'][1],
                         model_string,
+                        order['payment_mode'],
                         order['id'],
                         order['model']
                     ]).draw( false );

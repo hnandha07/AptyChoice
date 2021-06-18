@@ -50,6 +50,7 @@
                       <th>Reference #</th>
                         <th>Customer</th>
                         <th>Source</th>
+                        <th>Payment Mode</th>
                     </thead>
                       <tbody class="list-order"></tbody>
                   </table>
@@ -140,13 +141,6 @@
             </button>
           </t>
           </div>
-            <!--            <div class="row">-->
-
-            <!--            <button class="btn btn-primary print-order" data-new-state="cancel" data-order-id="order.id">-->
-            <!--              Print-->
-            <!--            </button>-->
-
-            <!--          </div>-->
 
         </t>
             <t t-elif="order.apty_order_state == 'cancel'">
