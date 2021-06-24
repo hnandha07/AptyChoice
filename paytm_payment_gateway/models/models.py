@@ -55,7 +55,7 @@ class PaymentAcquirerAtom(models.Model):
     def _get_paytm_urls(self):
         """ Atom URLS """
         return {
-            'paytm_form_url':'https://securegw-stage.paytm.in/order/process'
+            'paytm_form_url':'https://securegw.paytm.in/order/process'
         }
 
 
@@ -69,11 +69,11 @@ class PaymentAcquirerAtom(models.Model):
         paytm_values=dict (
                           MID=self.paytm_merchant_id ,
                           ORDER_ID=str(values ['reference']) ,
-                          CUST_ID = str(values.get('partner_id')),
+                          CUST_ID=str(values.get('partner_id')),
                           INDUSTRY_TYPE_ID='Retail' ,
                           CHANNEL_ID = CHANNEL_ID,
                           TXN_AMOUNT=str(round(values['amount'], 2)) ,
-                          WEBSITE='WEBSTAGING',
+                          WEBSITE='DEFAULT',
                           EMAIL=str(values.get ('partner_email')) ,
                           MOBILE_NO = str(values.get('partner_phone')),
                           CALL_BACK_URL=urls.url_join (base_url ,'/payment/paytm/return/') ,

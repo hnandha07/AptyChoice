@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import datetime
+
 from odoo import http
 from odoo.http import request
 
@@ -8,17 +10,12 @@ class AptyChoiceDashboard(http.Controller):
     @http.route("/get_order_list", type="json", auth="user")
     def get_order_list(self, **kwargs):
         apty_order_state = kwargs.get('state')
-        print('-apty_order_state-', apty_order_state)
-        sale_orders = request.env['sale.order'].search_read([('state', '=', 'sale')], ['id', 'name', 'partner_id', 'write_date', 'transaction_ids'])
-        print('------saleorder---\n\n\n\n', sale_orders)
+        sale_orders = request.env['sale.order'].search_read([('state', '=', 'sale'), ('apty_order_state', '=', apty_order_state)], ['id', 'name', 'partner_id', 'write_date', 'transaction_ids'])
         for so in sale_orders:
             so['model'] = 'sale.order'
             if so.get('transaction_ids'):
-                print('---so.transaction_ids--', so.get('transaction_ids')[0])
                 payment_trans = request.env['payment.transaction'].search([('id', '=', so.get('transaction_ids')[0])])
                 if payment_trans:
-                    print('payment_trans-----', payment_trans)
-                    print('payment_trans--name---', payment_trans.acquirer_id.name)
                     so['payment_mode'] = payment_trans.acquirer_id.name
                 else:
                     so['payment_mode'] = 'None'
@@ -35,7 +32,6 @@ class AptyChoiceDashboard(http.Controller):
             #     po['company_id'] = (company_details.name, company_details.phone, company_details.vat, company_details.email, company_details.website)
             #     print('----company_details--', company_details)
         res = sorted(sale_orders + pos_orders, key=lambda d: d['write_date'], reverse=True)
-        print('----res', res)
         return {"orders": res or []}
 
     @http.route("/get_delivery_partners", type="json", auth="user")
@@ -49,4 +45,17 @@ class AptyChoiceDashboard(http.Controller):
                 'email': user.email
             })
         return { 'partners': partners}
-    
+
+    @http.route("/order/process/cod", type="json", auth="user")
+    def order_process_cod(self, **kwargs):
+        if kwargs and kwargs.get('order_id'):
+            order_id = request.env[kwargs.get('model')].sudo().search([('id', '=', kwargs.get('order_id'))])
+            payment_transaction_id = request.env['payment.transaction'].sudo().search([('reference', 'ilike', order_id.name)], order='id desc', limit=1)
+            payment_transaction_id._set_transaction_done()
+            payment_transaction_id._post_process_after_done()
+            order_id.write({
+                'apty_order_state': 'delivered',
+                'delivered_by': request.uid,
+                'delivered_date': datetime.datetime.now()
+            })
+        return {"status": True}

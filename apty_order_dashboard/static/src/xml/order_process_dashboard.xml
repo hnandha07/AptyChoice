@@ -332,5 +332,26 @@
         </div>
       </div>
     </div>
+
+        <!-- Cash on Delivery payment confirmation -->
+        <div role="dialog" class="modal fade" id="cod-confirmation">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <header class="modal-header">
+                        <h4 class="modal-title">Cash on Delivery confirmation</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">&amp;times;</button>
+                    </header>
+                    <main class="modal-body">
+                        <h3>This order has Cash on Delivery payment mode. Kindly confirm once payment has been received.</h3>
+                    </main>
+                    <footer class="modal-footer">
+                        <button class="btn btn-primary confirm-cod-received" t-att-data-model="order.model" t-att-data-order-id="order.id">
+                            Confirm
+                        </button>
+                        <a role="button" href="#" class="btn btn-link btn-sm" data-dismiss="modal">Close</a>
+                    </footer>
+                </div>
+            </div>
+        </div>
   </t>
 </templates>

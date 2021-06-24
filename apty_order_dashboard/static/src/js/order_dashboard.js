@@ -27,6 +27,7 @@ var OrderProcessDashboard = AbstractAction.extend({
         "click .print-order": '_print_order',
         "click .js_custom_print": '_js_custom_print',
         "click .confirm-assign": '_confirm_assign',
+        "click .confirm-cod-received": '_confirm_cod_received',
     },
 
     start: function () {
@@ -153,6 +154,7 @@ var OrderProcessDashboard = AbstractAction.extend({
         var state = $(ev.currentTarget).data('new-state');
         var delivery_popup = $('#assign-delivery-partner');
         var delivery_list = $(delivery_popup).find('#delivery_person');
+        var cod_confirmation_popup = $('#cod-confirmation');
         var new_state = $('.state-btn[data-state='+ state +']');
         var old_state = $(ev.currentTarget).data('old-state');
         var update_date = old_state + '_date';
@@ -162,7 +164,7 @@ var OrderProcessDashboard = AbstractAction.extend({
             ' ' +
           [ d.getUTCHours().padLeft(), d.getUTCMinutes().padLeft(), d.getUTCSeconds().padLeft()].join(':');
         if (active_model === 'sale.order' && state === 'delivered'){
-            console.log("COD")
+            $(cod_confirmation_popup).modal('toggle');
         }
         else{
             if (state === 'picked'){
@@ -242,6 +244,21 @@ var OrderProcessDashboard = AbstractAction.extend({
             $(confirm_modal).modal('toggle');
             $(order_row).trigger('click');
         });
+    },
+
+    _confirm_cod_received: function(ev) {
+        var order_id = $(ev.currentTarget).data('order-id');
+        var confirm_modal = $('#cod-confirmation');
+        var order_row = $('.order-row[data-order-id='+ order_id +']');
+        var active_model = $(ev.currentTarget).data('model');
+        var new_state = $('.state-btn[data-state=delivered]');
+        ajax.rpc("/order/process/cod", {
+                'order_id': order_id,
+                'model': active_model
+            }).then(function (data) {
+                $(confirm_modal).modal('toggle');
+                $(new_state).trigger('click');
+            });
     }
 });
 core.action_registry.add('order_process_dashboard', OrderProcessDashboard);

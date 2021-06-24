@@ -603,7 +603,7 @@ class Shop(Website):
         offset = json_data.get('scroll_count', 0) * 10
         product_obj = request.env['product.product'].sudo()
         order = 'create_date'
-        domain = [('active', '=', True),('is_available','=', True)]
+        domain = [('active', '=', True),('is_available','=', True), ('is_published', '=', True)]
         if json_data.get('filter_by_category', False):
             domain += [('categ_id', 'in', json_data.get('categ_ids',[]))]
         if json_data.get('custom_search', False) and json_data.get('custom_search_keyword', False):
