@@ -624,5 +624,5 @@ class Shop(Website):
             })
         return {
             'products': product_obj,
-            'categories': request.env['product.category'].sudo().search_read(fields=['name', 'id'])
+            'categories': request.env['product.category'].sudo().search_read([('app_allowed', '=', True)], fields=['name', 'id'])
         }

@@ -37,3 +37,9 @@ class ResPartner(models.Model):
                 else:
                     details.update({field: self[field]})
             return details
+
+
+class ProductCategoryInherit(models.Model):
+    _inherit = 'product.category'
+
+    app_allowed = fields.Boolean(string="Is allowed in Mobile App", default=True)

@@ -31,5 +31,16 @@
                 </xpath>
             </field>
         </record>
+
+        <record id="view_product_category_app_form_inherit" model="ir.ui.view">
+            <field name="name">view.product.category.app.form.inherit</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="product.product_category_form_view"/>
+            <field name="arch" type="xml">
+                <field name="parent_id" position="after">
+                    <field name="app_allowed"/>
+                </field>
+            </field>
+        </record>
     </data>
 </odoo>
