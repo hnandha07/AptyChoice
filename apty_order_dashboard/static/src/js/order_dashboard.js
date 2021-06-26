@@ -152,6 +152,7 @@ var OrderProcessDashboard = AbstractAction.extend({
         var order_id = $(ev.currentTarget).parents().find('.details').data('order-id');
         var active_model = $(ev.currentTarget).parents().find('.details').data('model');
         var state = $(ev.currentTarget).data('new-state');
+        var payment_method = $(ev.currentTarget).parents().find('.details').data('payment-type');
         var delivery_popup = $('#assign-delivery-partner');
         var delivery_list = $(delivery_popup).find('#delivery_person');
         var cod_confirmation_popup = $('#cod-confirmation');
@@ -163,7 +164,7 @@ var OrderProcessDashboard = AbstractAction.extend({
         var dformat = [ d.getFullYear(), (d.getMonth()+1).padLeft(), d.getDate().padLeft()].join('-')+
             ' ' +
           [ d.getUTCHours().padLeft(), d.getUTCMinutes().padLeft(), d.getUTCSeconds().padLeft()].join(':');
-        if (active_model === 'sale.order' && state === 'delivered'){
+        if (active_model === 'sale.order' && state === 'delivered' &&  payment_method === 'cash_on_delivery'){
             $(cod_confirmation_popup).modal('toggle');
         }
         else{

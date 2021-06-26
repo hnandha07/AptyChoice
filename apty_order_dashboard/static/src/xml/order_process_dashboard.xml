@@ -342,7 +342,8 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">&amp;times;</button>
                     </header>
                     <main class="modal-body">
-                        <h3>This order has Cash on Delivery payment mode. Kindly confirm once payment has been received.</h3>
+                        <h3>Payment Confirmation : <t t-esc="order.name"/> for amount <t t-esc="order.amount_total"/> </h3>
+                        <p>Please confirm when payment is received from the customer at the time of delivery.</p>
                     </main>
                     <footer class="modal-footer">
                         <button class="btn btn-primary confirm-cod-received" t-att-data-model="order.model" t-att-data-order-id="order.id">
