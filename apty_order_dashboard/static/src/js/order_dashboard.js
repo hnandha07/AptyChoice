@@ -66,10 +66,11 @@ var OrderProcessDashboard = AbstractAction.extend({
                     dt_order.row.add([
                         order['name'],
                         order['partner_id'][1],
-                        model_string,
+                        order['order_source'],
                         order['payment_mode'],
                         order['id'],
-                        order['model']
+                        order['model'],
+                        model_string
                     ]).draw( false );
                 });
             }
@@ -138,10 +139,11 @@ var OrderProcessDashboard = AbstractAction.extend({
                     dt_order.row.add([
                         order['name'],
                         order['partner_id'][1],
-                        model_string,
+                        order['order_source'],
                         order['payment_mode'],
                         order['id'],
-                        order['model']
+                        order['model'],
+                        model_string
                     ]).draw( false );
                 });
             }
@@ -211,14 +213,17 @@ var OrderProcessDashboard = AbstractAction.extend({
 
     _confirm_cancel: function (ev) {
         var order_id = $(ev.currentTarget).data('order-id');
+        var order_model = $(ev.currentTarget).data('model');
         var confirm_modal = $('#cancel-confirmation');
+        var new_state = $('.state-btn[data-state=cancel]');
         var order_row = $('.order-row[data-order-id='+ order_id +']');
         rpc.query({
-          model: 'sale.order',
+          model: order_model,
           method: 'write',
           args: [parseInt(order_id), {'reason': $('input[name="reason"]').val(), 'apty_order_state': 'cancel'}],
         }).then(function (data){
             $(confirm_modal).modal('toggle');
+            $(new_state).trigger('click');
             $(order_row).trigger('click');
         });
     },
@@ -229,6 +234,7 @@ var OrderProcessDashboard = AbstractAction.extend({
         var order_row = $('.order-row[data-order-id='+ order_id +']');
         var partner_selected = $( "#delivery_person option:selected" ).val();
         var active_model = $(ev.currentTarget).data('model');
+        var new_state = $('.state-btn[data-state=picked]');
         var d = new Date();
         var dformat = [ d.getFullYear(), (d.getMonth()+1).padLeft(), d.getDate().padLeft()].join('-')+
             ' ' +
@@ -243,6 +249,7 @@ var OrderProcessDashboard = AbstractAction.extend({
             }]
         }).then( function (data) {
             $(confirm_modal).modal('toggle');
+            $(new_state).trigger('click');
             $(order_row).trigger('click');
         });
     },

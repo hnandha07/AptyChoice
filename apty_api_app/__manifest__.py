@@ -15,6 +15,7 @@
     'depends': ['base_geolocalize','base_setup','website_sale'],
     'data': [
         'security/ir.model.access.csv',
+        'data/apty_data.xml',
         'views/regional_delivery_charge.xml',
         'views/home_page_view.xml',
         'views/sale_order_view.xml',

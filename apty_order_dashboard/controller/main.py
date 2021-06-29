@@ -1,18 +1,26 @@
 # -*- coding: utf-8 -*-
 import datetime
-
+from datetime import timedelta as td
 from odoo import http
 from odoo.http import request
-
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 class AptyChoiceDashboard(http.Controller):
 
     @http.route("/get_order_list", type="json", auth="user")
     def get_order_list(self, **kwargs):
         apty_order_state = kwargs.get('state')
-        sale_orders = request.env['sale.order'].search_read([('state', '=', 'sale'), ('apty_order_state', '=', apty_order_state)], ['id', 'name', 'partner_id', 'write_date', 'transaction_ids'])
+        so_domain = [('state', '=', 'sale'), ('apty_order_state', '=', apty_order_state)]
+        pos_domain = [('state', '=', 'paid'), ('apty_order_state', '=', apty_order_state)]
+        if kwargs.get('state') in ['delivered', 'cancel']:
+            today = datetime.datetime.now()
+            last_order_date = (today - td(days=5)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+            so_domain.append(('write_date', '>=', last_order_date))
+            pos_domain.append(('write_date', '>=', last_order_date))
+        sale_orders = request.env['sale.order'].search_read(so_domain, ['id', 'name', 'partner_id', 'write_date', 'transaction_ids', 'team_id'])
         for so in sale_orders:
             so['model'] = 'sale.order'
+            so['order_source'] = so.get('team_id')[-1]
             if so.get('transaction_ids'):
                 payment_trans = request.env['payment.transaction'].search([('id', '=', so.get('transaction_ids')[0])])
                 if payment_trans:
@@ -21,10 +29,11 @@ class AptyChoiceDashboard(http.Controller):
                     so['payment_mode'] = 'None'
             else:
                 so['payment_mode'] = 'None'
-        pos_orders = request.env['pos.order'].search_read([('state', '=', 'paid'), ('apty_order_state', '=', apty_order_state)], ['id', 'name', 'partner_id', 'write_date'])
+        pos_orders = request.env['pos.order'].search_read(pos_domain, ['id', 'name', 'partner_id', 'write_date'])
         for po in pos_orders:
             po['model'] = 'pos.order'
             po['payment_mode'] = 'Cash'
+            po['order_source'] = 'Point of Sale'
             if not po.get('partner_id'):
                 po['partner_id'] = ('', '')
             # if po.get('company_id')[0]:

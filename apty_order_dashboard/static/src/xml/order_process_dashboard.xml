@@ -196,7 +196,7 @@
                 <input name="reason"/>
             </main>
             <footer class="modal-footer">
-              <button class='btn btn-primary confirm-cancel' t-att-data-order-id="order.id">Confirm</button>
+              <button class='btn btn-primary confirm-cancel' t-att-data-order-id="order.id" t-att-data-model="order.model">Confirm</button>
                 <a role="button" href="#" class="btn btn-link btn-sm" data-dismiss="modal">Close</a>
             </footer>
         </div>

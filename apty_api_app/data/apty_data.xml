@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record forcecreate="True" id="team_mobile_app" model="crm.team">
+            <field name="name">Mobile Application</field>
+            <field name="use_quotations">True</field>
+        </record>
+    </data>
+</odoo>

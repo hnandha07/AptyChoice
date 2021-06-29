@@ -25,6 +25,9 @@
                             <field name="cancelled_by"/>
                         </group>
                     </group>
+                    <group>
+                        <field name="reason"/>
+                    </group>
                 </page>
             </xpath>
 

@@ -297,6 +297,8 @@ class WebsiteSale(WebsiteSale):
                 'allowed_company_ids':[order.company_id.id]
             })
             request.env.user = user
+            app_team = request.env.ref('apty_api_app.team_mobile_app')
+            values['team_id'] = app_team.id
             order.sudo().with_context(ctx).write(values)
             return {
                 'order_id': order.id,

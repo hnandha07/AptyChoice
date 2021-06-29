@@ -7,6 +7,7 @@ class PoSOrderInherit(models.Model):
 
     apty_order_state = fields.Selection(selection=[('draft', 'Draft'), ('order', 'Order'), ('preparing', 'Preparing'), ('ready', 'Ready'), ('picked', 'Picked'), ('delivered', 'Delivered'), ('cancel', 'Cancel')], 
                                         string="Apty Order State", default='order')
+    reason = fields.Char('Reason for cancel')
 
     order_date = fields.Datetime(string='Order Date', related='create_date')
     order_by = fields.Many2one('res.users', string='Order By')
